@@ -87,15 +87,26 @@ void ReadWriteCSV::InKetQuaDiemDanh()
 {
     string StudentsPresent;
     string StudentsNOTPresent;
+
+    int countStudentPresent = 0;
+    int countStudentNOTPresent = 0;
+
     for (size_t i = 0; i < studentCount; i++)
     {
         if (v_students_isPresent[i] == "x")
+        {
             StudentsPresent += fmt::format("{0}\n", v_students_names[i]);
+            countStudentPresent++;
+        }
         else
+        {
             StudentsNOTPresent += fmt::format("{0}\n", v_students_names[i]);
+            countStudentNOTPresent++;
+        }
     }
-    fmt::println("Danh sách sinh viên có mặt:\n" + StudentsPresent + "\n\n");
-    fmt::println("Danh sách sinh viên KHÔNG có mặt:\n" + StudentsNOTPresent + "\n\n");
+
+    fmt::println("Có {0} sinh viên có mặt. Danh sách sinh viên có mặt:\n{1}\n\n",countStudentPresent, StudentsPresent);
+    fmt::println("Có {0} sinh viên KHÔNG có mặt. Danh sách sinh viên KHÔNG có mặt:\n{1}\n\n", countStudentNOTPresent, StudentsNOTPresent);
 }
 
 /// <summary>
