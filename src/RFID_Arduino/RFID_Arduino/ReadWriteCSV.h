@@ -12,4 +12,5 @@ public:
 	static void InKetQuaDiemDanh();
 	static void LuuDuLieuDiemDanh();
 	static void AddStudentToCSV(string ID_Card);
+	static void RemoveStudentFromCSV();
 };

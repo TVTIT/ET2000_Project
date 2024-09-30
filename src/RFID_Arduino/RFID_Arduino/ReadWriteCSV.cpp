@@ -157,3 +157,45 @@ void ReadWriteCSV::AddStudentToCSV(string ID_Card)
 
     fmt::println("Lưu thành công thông tin sinh viên!");
 }
+
+/// <summary>
+/// Xoá sinh viên khỏi file CSV
+/// </summary>
+void ReadWriteCSV::RemoveStudentFromCSV()
+{
+    ClearScreen();
+    fmt::println("Danh sách sinh viên hiện tại:\n");
+    
+    for (int i = 0; i < studentCount; i++)
+    {
+        fmt::println("[{0}] {1}", i + 1, v_students_names[i]);
+    }
+
+    fmt::print("\nNhập số thứ tự sinh viên muốn xoá: ");
+    string user_input;
+    getline(cin, user_input);
+
+    //Try catch đề phòng user nhập ký tự không phải số
+    try
+    {
+        int int_user_input = stoi(user_input);
+        //Kiểm tra xem số nhập vào có nằm trong số thứ tự không
+        if (int_user_input <= studentCount)
+        {
+            Student_ListCSV.RemoveRow(int_user_input - 1);
+            Student_ListCSV.Save(ReadWriteCSV::DirectoryPath + "\\students_list.csv");
+            ReadWriteCSV::InitializeCSV();
+
+            fmt::println("Xoá sinh viên thành công!");
+        }
+        else
+        {
+            fmt::println("Số thứ tự không hợp lệ!");
+        }
+        
+    }
+    catch (const std::exception&)
+    {
+        fmt::println("Lựa chọn không hợp lệ!");
+    }
+}

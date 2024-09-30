@@ -270,7 +270,8 @@ void MainInterface()
 	string user_input = "";
 	fmt::println("[1] Thực hiện điểm danh");
 	fmt::println("[2] Thêm thành viên vào lớp học");
-	fmt::println("[3] Thoát");
+	fmt::println("[3] Xoá thành viên khỏi lớp học");
+	fmt::println("[4] Thoát");
 	fmt::print("Nhập lựa chọn của bạn: ");
 
 	getline(cin, user_input);
@@ -283,6 +284,11 @@ void MainInterface()
 		AddStudent();
 	}
 	else if (user_input == "3")
+	{
+		ReadWriteCSV::RemoveStudentFromCSV();
+		PauseAndBack();
+	}
+	else if (user_input == "4")
 	{
 
 	}
