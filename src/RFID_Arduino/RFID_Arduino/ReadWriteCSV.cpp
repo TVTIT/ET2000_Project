@@ -66,7 +66,7 @@ void ReadWriteCSV::InitializeCSV()
 
     studentCount = v_students_IDscard.size();
 
-    v_students_isPresent.resize(studentCount);
+    v_students_isPresent.resize(studentCount + 1);
 }
 
 /// <summary>
@@ -104,6 +104,7 @@ void ReadWriteCSV::InKetQuaDiemDanh()
             countStudentNOTPresent++;
         }
     }
+    v_students_isPresent[studentCount] = "Count: " + to_string(countStudentPresent);
 
     fmt::println("Có {0} sinh viên có mặt. Danh sách sinh viên có mặt:\n{1}\n\n",countStudentPresent, StudentsPresent);
     fmt::println("Có {0} sinh viên KHÔNG có mặt. Danh sách sinh viên KHÔNG có mặt:\n{1}\n\n", countStudentNOTPresent, StudentsNOTPresent);
@@ -119,7 +120,7 @@ void ReadWriteCSV::LuuDuLieuDiemDanh()
     doc.Save(ReadWriteCSV::DirectoryPath + "\\Du lieu diem danh " + GetTimeNow(1) + ".csv");
 
     v_students_isPresent.clear();
-    v_students_isPresent.resize(studentCount);
+    v_students_isPresent.resize(studentCount + 1);
 
     fmt::println("Đã lưu dữ liệu điểm danh vào file csv!");
 }
