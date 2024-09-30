@@ -13,6 +13,7 @@
 using namespace std;
 using namespace rapidcsv;
 
+rapidcsv::Document Student_ListCSV;
 vector<string> v_students_names;
 vector<string> v_students_IDscard;
 vector<string> v_students_isPresent;
@@ -59,10 +60,12 @@ void ReadWriteCSV::GetStudentName(string id_card, string& student_name, bool& av
 /// </summary>
 void ReadWriteCSV::InitializeCSV()
 {
-    rapidcsv::Document doc(ReadWriteCSV::DirectoryPath + "\\students_list.csv", rapidcsv::LabelParams(0, -1));
+    //rapidcsv::Document doc(ReadWriteCSV::DirectoryPath + "\\students_list.csv", rapidcsv::LabelParams(0, -1));
 
-    v_students_names = doc.GetColumn<string>("Name and Student ID");
-    v_students_IDscard = doc.GetColumn<string>("ID card");
+    Student_ListCSV = rapidcsv::Document(ReadWriteCSV::DirectoryPath + "\\students_list.csv", rapidcsv::LabelParams(0, -1));
+
+    v_students_names = Student_ListCSV.GetColumn<string>("Name and Student ID");
+    v_students_IDscard = Student_ListCSV.GetColumn<string>("ID card");
 
     studentCount = v_students_IDscard.size();
 
@@ -115,9 +118,11 @@ void ReadWriteCSV::InKetQuaDiemDanh()
 /// </summary>
 void ReadWriteCSV::LuuDuLieuDiemDanh()
 {
-    rapidcsv::Document doc(ReadWriteCSV::DirectoryPath + "\\students_list.csv", rapidcsv::LabelParams(0, -1));
-    doc.InsertColumn(2, v_students_isPresent, "Is present");
-    doc.Save(ReadWriteCSV::DirectoryPath + "\\Du lieu diem danh " + GetTimeNow(1) + ".csv");
+    //rapidcsv::Document doc(ReadWriteCSV::DirectoryPath + "\\students_list.csv", rapidcsv::LabelParams(0, -1));
+    Student_ListCSV.InsertColumn(2, v_students_isPresent, "Is present");
+    Student_ListCSV.Save(ReadWriteCSV::DirectoryPath + "\\Du lieu diem danh " + GetTimeNow(1) + ".csv");
+    Student_ListCSV.RemoveColumn(2);
+    Student_ListCSV.RemoveRow(studentCount);
 
     v_students_isPresent.clear();
     v_students_isPresent.resize(studentCount + 1);
@@ -144,9 +149,9 @@ void ReadWriteCSV::AddStudentToCSV(string ID_Card)
     string student_name = wstring_to_utf8(wstr_student_name);
 
     vector<string> newInfo = { student_name, ID_Card };
-    rapidcsv::Document doc(ReadWriteCSV::DirectoryPath + "\\students_list.csv", rapidcsv::LabelParams(0, -1));
-    doc.InsertRow(studentCount, newInfo);
-    doc.Save();
+    //rapidcsv::Document doc(ReadWriteCSV::DirectoryPath + "\\students_list.csv", rapidcsv::LabelParams(0, -1));
+    Student_ListCSV.InsertRow(studentCount, newInfo);
+    Student_ListCSV.Save(ReadWriteCSV::DirectoryPath + "\\students_list.csv");
 
     InitializeCSV();
 

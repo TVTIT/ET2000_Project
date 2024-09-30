@@ -1,3 +1,3 @@
 ﻿  ReadWriteCSV.cpp
-D:\Hoc\ET2000 Project\src\RFID_Arduino\RFID_Arduino\ReadWriteCSV.cpp(67,43): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+D:\Hoc\ET2000 Project\src\RFID_Arduino\RFID_Arduino\ReadWriteCSV.cpp(70,43): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
   RFID_Arduino.vcxproj -> D:\Hoc\ET2000 Project\src\RFID_Arduino\x64\Debug\RFID_Arduino.exe
