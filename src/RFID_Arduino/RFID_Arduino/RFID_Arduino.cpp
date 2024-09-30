@@ -7,7 +7,6 @@
 #include <thread>
 #include <fstream>
 #include "ReadWriteCSV.h"
-//#include "ReadWriteCSV.cpp"
 
 using namespace std;
 
@@ -145,77 +144,6 @@ void InitializeRFID()
 	}
 }
 
-//void InitializeRFID()
-//{
-//	bool isCOMAvailable = false;
-//
-//	//// Cài đặt cấu hình serial
-//	//dcbSerialParams = { 0 };
-//	//dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
-//
-//	//dcbSerialParams.BaudRate = CBR_9600;    // Tốc độ baud
-//	//dcbSerialParams.ByteSize = 8;           // 8 bit dữ liệu
-//	//dcbSerialParams.StopBits = ONESTOPBIT;  // 1 stop bit
-//	//dcbSerialParams.Parity = NOPARITY;    // Không parity
-//
-//	//// Cấu hình timeout
-//	//timeouts = { 0 };
-//	//timeouts.ReadIntervalTimeout = 50;
-//	//timeouts.ReadTotalTimeoutConstant = 50;
-//	//timeouts.ReadTotalTimeoutMultiplier = 10;
-//
-//	for (int i = 1; i <= 10; i++)
-//	{
-//		wstring wstr_COM_Port = L"COM" + to_wstring(i);
-//		const wchar_t* wchar_COM_Port = wstr_COM_Port.c_str();
-//		hSerial = CreateFile(wchar_COM_Port, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-//
-//		if (hSerial != INVALID_HANDLE_VALUE)
-//		{
-//			isCOMAvailable = true;
-//			break;
-//		}
-//	}
-//
-//	if (!isCOMAvailable)
-//	{
-//		fmt::println("Không thể mở cổng COM. Hãy kiểm tra lại kết nối với thiết bị");
-//		PauseAndExit();
-//	}
-//
-//	// Cài đặt cấu hình serial
-//	dcbSerialParams = { 0 };
-//	dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
-//	if (!GetCommState(hSerial, &dcbSerialParams))
-//	{
-//		fmt::println("Không thể lấy trạng thái cổng COM. Hãy kiểm tra lại kết nối với thiết bị");
-//		PauseAndExit();
-//	}
-//
-//	dcbSerialParams.BaudRate = CBR_9600;    // Tốc độ baud
-//	dcbSerialParams.ByteSize = 8;           // 8 bit dữ liệu
-//	dcbSerialParams.StopBits = ONESTOPBIT;  // 1 stop bit
-//	dcbSerialParams.Parity = NOPARITY;    // Không parity
-//
-//	if (!SetCommState(hSerial, &dcbSerialParams))
-//	{
-//		fmt::println("Không thể cài đặt cấu hình cổng COM. Hãy kiểm tra lại kết nối với thiết bị");
-//		PauseAndExit();
-//	}
-//
-//	// Cấu hình timeout
-//	timeouts = { 0 };
-//	timeouts.ReadIntervalTimeout = 50;
-//	timeouts.ReadTotalTimeoutConstant = 50;
-//	timeouts.ReadTotalTimeoutMultiplier = 10;
-//
-//	if (!SetCommTimeouts(hSerial, &timeouts))
-//	{
-//		fmt::println("Không thể cài đặt timeout");
-//		PauseAndExit();
-//	}
-//}
-
 /// <summary>
 /// Hàm để lấy thời gian hiện tại theo hệ thông, trả về string
 /// </summary>
@@ -318,12 +246,8 @@ void DiemDanh()
 		{
 			fmt::println("Lỗi khi đọc dữ liệu từ cổng COM. Hãy kiểm tra lại kết nối với thiết bị");
 			fmt::println("Đang lưu kết quả điểm danh...\n\n");
-			//EnterHookThread.detach();
-			//std::abort();
-			//bool abc = TerminateThread(EnterHookThread.native_handle(), 1);
 			ReadWriteCSV::InKetQuaDiemDanh();
 			ReadWriteCSV::LuuDuLieuDiemDanh();
-			//PauseAndExit();
 
 			//Do còn EnterHookThread đang chạy nên gọi hàm PauseAndExit() sẽ phải bấm enter 2 lần mới thoát được
 			fmt::println("\nNhấn phím Enter để thoát...");
