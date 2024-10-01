@@ -2,8 +2,9 @@
 #include <iostream>
 #include <string>
 #include <Windows.h>
-#include <fmt/base.h>
-#include <fmt/chrono.h>
+#include "fmt/core.h"
+#include "fmt/base.h"
+#include "fmt/chrono.h"
 #include <fcntl.h>
 #include <io.h>
 

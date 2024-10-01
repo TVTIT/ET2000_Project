@@ -142,6 +142,20 @@
     <ClCompile Include="RFID_Arduino.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="fmt\args.h" />
+    <ClInclude Include="fmt\base.h" />
+    <ClInclude Include="fmt\chrono.h" />
+    <ClInclude Include="fmt\color.h" />
+    <ClInclude Include="fmt\compile.h" />
+    <ClInclude Include="fmt\core.h" />
+    <ClInclude Include="fmt\format-inl.h" />
+    <ClInclude Include="fmt\format.h" />
+    <ClInclude Include="fmt\os.h" />
+    <ClInclude Include="fmt\ostream.h" />
+    <ClInclude Include="fmt\printf.h" />
+    <ClInclude Include="fmt\ranges.h" />
+    <ClInclude Include="fmt\std.h" />
+    <ClInclude Include="fmt\xchar.h" />
     <ClInclude Include="rapidcsv.h" />
     <ClInclude Include="ReadWriteCSV.h" />
     <ClInclude Include="RFID_Arduino.h" />
