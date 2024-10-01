@@ -85,15 +85,6 @@ void InitializeRFID()
 	{
 		getline(COM_Port_File, COM_Port);
 	}
-	/*else
-	{
-		fmt::println("Chuột phải vào This PC -> Manage -> Device Manager -> Ports (COM & LPT)");
-		fmt::print("Tìm tên Arduino UNO rồi nhập tên cổng vào (COMx): ");
-		getline(wcin, COM_Port);
-		COM_Port_File.open(ReadWriteCSV::DirectoryPath + "\\COM_Port.dat", std::ofstream::out | std::ofstream::app);
-		COM_Port_File << COM_Port;
-		COM_Port_File.close();
-	}*/
 
 	hSerial = CreateFile(COM_Port.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 
