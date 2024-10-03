@@ -1,1 +1,8 @@
-﻿
+﻿  ReadWriteCSV.cpp
+D:\Hoc\ET2000 Project\src\RFID_Arduino\RFID_Arduino\ReadWriteCSV.cpp(70,43): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+  RFID_Arduino.cpp
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 2063 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  RFID_Arduino.vcxproj -> D:\Hoc\ET2000 Project\src\RFID_Arduino\x64\Release\RFID_Arduino.exe

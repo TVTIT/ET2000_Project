@@ -99,12 +99,12 @@ void ReadWriteCSV::InKetQuaDiemDanh()
     {
         if (v_students_isPresent[i] == "x")
         {
-            StudentsPresent += fmt::format("{0}\n", v_students_names[i]);
+            StudentsPresent += v_students_names[i] + "\n";
             countStudentPresent++;
         }
         else
         {
-            StudentsNOTPresent += fmt::format("{0}\n", v_students_names[i]);
+            StudentsNOTPresent += v_students_names[i] + "\n";
             countStudentNOTPresent++;
         }
     }

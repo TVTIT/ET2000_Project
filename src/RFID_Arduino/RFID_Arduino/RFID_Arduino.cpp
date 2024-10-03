@@ -6,8 +6,8 @@
 #include "fmt/core.h"
 #include <thread>
 #include <fstream>
+#include <sstream>
 #include "ReadWriteCSV.h"
-
 using namespace std;
 
 void MainInterface();
@@ -135,6 +135,13 @@ void InitializeRFID()
 	}
 }
 
+void SentStartupCommand()
+{
+	char startupCommand[] = "startup";
+	DWORD bytes_written;
+	WriteFile(hSerial, startupCommand, sizeof(startupCommand), &bytes_written, NULL);
+}
+
 /// <summary>
 /// Hàm để lấy thời gian hiện tại theo hệ thông, trả về string
 /// </summary>
@@ -255,6 +262,130 @@ void DiemDanh()
 	EnterHookThread.join();
 }
 
+void ReadTXTFileInSDCard()
+{
+	ClearScreen();
+	fmt::println("Đang đọc dữ liệu từ thẻ nhớ...\n");
+
+	char printCommand[] = "printTXTFile";
+	DWORD bytes_written;
+	if (WriteFile(hSerial, printCommand, sizeof(printCommand), &bytes_written, NULL))
+	{
+		char szBuff[2000];
+		DWORD dwBytesRead = 0;
+		string IDsCardFromTXT;
+
+		if (ReadFile(hSerial, szBuff, sizeof(szBuff) - 1, &dwBytesRead, NULL))
+		{
+			if (dwBytesRead > 0) 
+			{
+				szBuff[dwBytesRead] = '\0';  // Kết thúc chuỗi
+				IDsCardFromTXT += szBuff;
+
+				stringstream stream_IDsCardFromTXT(IDsCardFromTXT);
+				string segment;
+				vector<string> IDsCardFromTXT_splited;
+
+				while (getline(stream_IDsCardFromTXT, segment, '\n'))
+				{
+					IDsCardFromTXT_splited.push_back(segment);
+				}
+
+				for (int i = 0; i < IDsCardFromTXT_splited.size(); i++)
+				{
+					bool isIDCardExists = false;
+					string student_name;
+
+					ReadWriteCSV::GetStudentName(IDsCardFromTXT_splited[i], student_name, isIDCardExists);
+					if (isIDCardExists)
+					{
+						fmt::println(student_name + " đã điểm danh");
+					}
+					else
+					{
+						fmt::println("ID thẻ {0} không nhận dạng được", IDsCardFromTXT_splited[i]);
+					}
+				}
+
+				fmt::println("Đọc dữ liệu hoàn tất! Nhấn phím Enter để tổng hợp kết quả...");
+				cin.get();
+
+				ReadWriteCSV::InKetQuaDiemDanh();
+				ReadWriteCSV::LuuDuLieuDiemDanh();
+
+
+			}
+			else
+			{
+				fmt::println("Lỗi khi đọc dữ liệu từ cổng COM. Hãy kiểm tra lại kết nối với thiết bị");
+
+				fmt::println("\nNhấn phím Enter để thử lại...");
+				cin.get();
+				ReadTXTFileInSDCard();
+			}
+		}
+
+		
+	}
+	else
+	{
+		fmt::println("Lỗi khi gửi dữ liệu qua cổng COM. Hãy kiểm tra lại kết nối với thiết bị");
+
+		fmt::println("\nNhấn phím Enter để thử lại...");
+		cin.get();
+		ReadTXTFileInSDCard();
+	}
+}
+
+void DiemDanhKhongKetNoi()
+{
+	ClearScreen();
+	fmt::println("Hãy chắc chắn thẻ nhớ đã được cắm vào thiết bị");
+	fmt::println("CẢNH BÁO: Dữ liệu điểm danh được lưu trong thẻ nhớ trước đó sẽ bị xoá sạch");
+	fmt::println("Nếu bạn muốn lưu lại kết quả điểm danh trước đó, hãy khởi động lại phần mềm");
+	fmt::println("và chọn lựa chọn 5");
+
+	fmt::println("Nhấn phím Enter để tiếp tục...");
+	cin.get();
+
+	char prepareCommand[] = "prepareForDisconnect";
+	DWORD bytes_written;
+
+	if (WriteFile(hSerial, prepareCommand, sizeof(prepareCommand), &bytes_written, NULL))
+	{
+		fmt::println("Sau khi nhấn phím Enter, hãy rút thiết bị ra và cắm nguồn 9V vào thiết bị");
+		fmt::println("Sau đó thực hiện việc quét thẻ điểm danh như bình thường\n");
+
+		fmt::println("Hãy rút thiết bị ra...\n");
+
+		char szBuff[32] = { 0 };
+		DWORD dwBytesRead = 0;
+		while (ReadFile(hSerial, szBuff, sizeof(szBuff) - 1, &dwBytesRead, NULL))
+		{
+
+		}
+		CloseHandle(hSerial);
+
+		fmt::println("Khi thực hiện điểm danh xong, kết nối lại thiết bị");
+		fmt::println("rồi nhấn Enter (hoặc chọn lựa chọn 5 ở màn hình chính)\n");
+
+		fmt::println("Nhấn phím Enter để tiếp tục...");
+		cin.get();
+
+		InitializeRFID();
+		ReadTXTFileInSDCard();
+	}
+	else
+	{
+		fmt::println("Lỗi khi gửi dữ liệu qua cổng COM. Hãy kiểm tra lại kết nối với thiết bị");
+
+		fmt::println("\nNhấn phím Enter để thoát...");
+		cin.get();
+
+		exit(1);
+	}
+}
+
 void MainInterface()
 {
 	ClearScreen();
@@ -262,7 +393,9 @@ void MainInterface()
 	fmt::println("[1] Thực hiện điểm danh");
 	fmt::println("[2] Thêm thành viên vào lớp học");
 	fmt::println("[3] Xoá thành viên khỏi lớp học");
-	fmt::println("[4] Thoát");
+	fmt::println("[4] Thực hiện điểm danh khi không kết nối máy tính");
+	fmt::println("[5] Đọc dữ liệu trong thẻ nhớ và điểm danh");
+	fmt::println("[6] Thoát");
 	fmt::print("Nhập lựa chọn của bạn: ");
 
 	getline(cin, user_input);
@@ -280,6 +413,16 @@ void MainInterface()
 		PauseAndBack();
 	}
 	else if (user_input == "4")
+	{
+		DiemDanhKhongKetNoi();
+		PauseAndBack();
+	}
+	else if (user_input == "5")
+	{
+		ReadTXTFileInSDCard();
+		PauseAndBack();
+	}
+	else if (user_input == "6")
 	{
 
 	}
@@ -310,6 +453,7 @@ int main()
 	ReadWriteCSV::GetPath();
 	ReadWriteCSV::InitializeCSV();
 	InitializeRFID();
+	SentStartupCommand();
 
 	//Đặt tiêu đề cho console (hiện trên đầu cửa sổ)
 	SetConsoleTitleW(L"Phần mềm điểm danh bằng thẻ sinh viên");

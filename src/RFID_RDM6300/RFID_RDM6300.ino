@@ -4,36 +4,31 @@
 
 #include "rdm6300.h"
 
-#define RDM6300_RX_PIN 2 //Chân RX của RDM6300
-#define READ_LED_PIN 13 //Led có sẵn trên Arduino
-#define WRITE_BUZZER_PIN 7 //Chân + của còi buzzer
+#define RDM6300_TX_PIN 2    //Chân TX của RDM6300
+#define READ_LED_PIN 13     //Led có sẵn trên Arduino
+#define WRITE_BUZZER_PIN 7  //Chân + của còi buzzer
 
 Rdm6300 rdm6300;
 
-void setup()
-{
-	Serial.begin(9600);
-
-	pinMode(READ_LED_PIN, OUTPUT);
-	digitalWrite(READ_LED_PIN, LOW);
-
-  pinMode(WRITE_BUZZER_PIN, OUTPUT);
+void setup() {
+  Serial.begin(9600);
+  pinMode(READ_LED_PIN, OUTPUT);
   digitalWrite(READ_LED_PIN, LOW);
 
-	rdm6300.begin(RDM6300_RX_PIN);
+  pinMode(WRITE_BUZZER_PIN, OUTPUT);
+
+  rdm6300.begin(RDM6300_TX_PIN);
 }
 
-void loop()
-{
-	if (rdm6300.get_new_tag_id())
-  {
+void loop() {
+  if (rdm6300.get_new_tag_id()) {
     Serial.print(rdm6300.get_tag_id(), HEX);
     digitalWrite(WRITE_BUZZER_PIN, HIGH);
     delay(50);
     digitalWrite(WRITE_BUZZER_PIN, LOW);
   }
 
-	digitalWrite(READ_LED_PIN, rdm6300.get_tag_id());
+  digitalWrite(READ_LED_PIN, rdm6300.get_tag_id());
 
-	delay(10);
+  delay(10);
 }
