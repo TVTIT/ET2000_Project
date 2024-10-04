@@ -4,6 +4,7 @@
 #include <string>
 #include "rapidcsv.h"
 #include "fmt/core.h"
+#include "fmt/color.h"
 #include <thread>
 #include <fstream>
 #include <sstream>
@@ -62,6 +63,20 @@ void ClearScreen()
 }
 
 /// <summary>
+/// Hỗ trợ output bằng màu và đặt tiêu đề cho console
+/// </summary>
+void InitializeConsole()
+{
+	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	DWORD dwMode = 0;
+	GetConsoleMode(hOut, &dwMode);
+	dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+	SetConsoleMode(hOut, dwMode);
+
+	SetConsoleTitleW(L"Phần mềm điểm danh bằng thẻ sinh viên");
+}
+
+/// <summary>
 /// Dùng cho thread để hook được nút enter, từ đó kết thúc quá trình điểm danh
 /// </summary>
 void HookEnter()
@@ -90,9 +105,12 @@ void InitializeRFID()
 
 	if (hSerial == INVALID_HANDLE_VALUE)
 	{
-		fmt::println("Không thể kết nối cổng COM. Hãy kiểm tra lại kết nối với thiết bị và nhập đúng cổng COM\n");
+		fmt::print(fmt::fg(fmt::color::black) | fmt::bg(fmt::color::yellow), "Không thể kết nối cổng COM. Hãy kiểm tra lại kết nối với thiết bị và nhập đúng cổng COM\n\n");
 		fmt::println("Chuột phải vào This PC -> Manage -> Device Manager -> Ports (COM & LPT)");
-		fmt::print("Tìm tên Arduino UNO rồi nhập tên cổng vào (COMx): ");
+		//fmt::print("Tìm tên Arduino UNO rồi nhập tên cổng vào (COMx): ");
+		fmt::print("Tìm tên ");
+		fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::gray), "Arduino UNO");
+		fmt::print(" rồi nhập tên cổng vào (COMx): ");
 		getline(wcin, COM_Port);
 		COM_Port_File.close();
 		COM_Port_File.open(ReadWriteCSV::DirectoryPath + "\\COM_Port.dat", std::ofstream::out | std::ofstream::trunc);
@@ -107,7 +125,7 @@ void InitializeRFID()
 	dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
 	if (!GetCommState(hSerial, &dcbSerialParams))
 	{
-		fmt::println("Không thể lấy trạng thái cổng COM. Hãy kiểm tra lại kết nối với thiết bị");
+		fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Không thể lấy trạng thái cổng COM. Hãy kiểm tra lại kết nối với thiết bị\n");
 		PauseAndExit();
 	}
 
@@ -118,7 +136,7 @@ void InitializeRFID()
 
 	if (!SetCommState(hSerial, &dcbSerialParams))
 	{
-		fmt::println("Không thể cài đặt cấu hình cổng COM. Hãy kiểm tra lại kết nối với thiết bị");
+		fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Không thể cài đặt cấu hình cổng COM. Hãy kiểm tra lại kết nối với thiết bị\n");
 		PauseAndExit();
 	}
 
@@ -130,7 +148,7 @@ void InitializeRFID()
 
 	if (!SetCommTimeouts(hSerial, &timeouts))
 	{
-		fmt::println("Không thể cài đặt timeout");
+		fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Không thể cài đặt timeout\n");
 		PauseAndExit();
 	}
 }
@@ -185,7 +203,9 @@ void AddStudent()
 				ReadWriteCSV::GetStudentName(str_szBuff, student_name, isIDCardExists);
 				if (isIDCardExists)
 				{
-					fmt::println("Thẻ vừa quét trùng với thẻ của " + student_name + " đã có sẵn");
+					fmt::print("Thẻ vừa quét trùng với thẻ của ");
+					fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::gray), student_name);
+					fmt::println(" đã có sẵn");
 					break;
 				}
 				else
@@ -197,7 +217,7 @@ void AddStudent()
 		}
 		else
 		{
-			fmt::println("Lỗi khi đọc dữ liệu từ cổng COM. Hãy kiểm tra lại kết nối với thiết bị");
+			fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Lỗi khi đọc dữ liệu từ cổng COM. Hãy kiểm tra lại kết nối với thiết bị\n");
 			PauseAndExit();
 		}
 	}
@@ -231,18 +251,19 @@ void DiemDanh()
 				ReadWriteCSV::GetStudentName(str_szBuff, student_name, isIDCardExists);
 				if (isIDCardExists)
 				{
-					fmt::println(student_name + " đã điểm danh vào lúc " + GetTimeNow(0));
+					//fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), student_name + " đã điểm danh vào lúc " + GetTimeNow(0) + "\n");
+					fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "{0} đã điểm danh vào lúc {1}\n", student_name, GetTimeNow(0));
 				}
 				else
 				{
-					fmt::println("Không nhận dạng được thẻ sinh viên");
+					fmt::print(fmt::fg(fmt::color::black) | fmt::bg(fmt::color::yellow), "Không nhận dạng được thẻ sinh viên\n");
 				}
 
 			}
 		}
 		else
 		{
-			fmt::println("Lỗi khi đọc dữ liệu từ cổng COM. Hãy kiểm tra lại kết nối với thiết bị");
+			fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Lỗi khi đọc dữ liệu từ cổng COM. Hãy kiểm tra lại kết nối với thiết bị\n");
 			fmt::println("Đang lưu kết quả điểm danh...\n\n");
 			ReadWriteCSV::InKetQuaDiemDanh();
 			ReadWriteCSV::LuuDuLieuDiemDanh();
@@ -307,7 +328,7 @@ void ReadTXTFileInSDCard()
 					}
 				}
 
-				fmt::println("Đọc dữ liệu hoàn tất! Nhấn phím Enter để tổng hợp kết quả...");
+				fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "Đọc dữ liệu hoàn tất! Nhấn phím Enter để tổng hợp kết quả...\n");
 				cin.get();
 
 				ReadWriteCSV::InKetQuaDiemDanh();
@@ -317,7 +338,7 @@ void ReadTXTFileInSDCard()
 			}
 			else
 			{
-				fmt::println("Lỗi khi đọc dữ liệu từ cổng COM. Hãy kiểm tra lại kết nối với thiết bị");
+				fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Lỗi khi đọc dữ liệu từ cổng COM. Hãy kiểm tra lại kết nối với thiết bị\n");
 
 				fmt::println("\nNhấn phím Enter để thử lại...");
 				cin.get();
@@ -329,7 +350,7 @@ void ReadTXTFileInSDCard()
 	}
 	else
 	{
-		fmt::println("Lỗi khi gửi dữ liệu qua cổng COM. Hãy kiểm tra lại kết nối với thiết bị");
+		fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Lỗi khi gửi dữ liệu qua cổng COM. Hãy kiểm tra lại kết nối với thiết bị\n");
 
 		fmt::println("\nNhấn phím Enter để thử lại...");
 		cin.get();
@@ -341,7 +362,7 @@ void DiemDanhKhongKetNoi()
 {
 	ClearScreen();
 	fmt::println("Hãy chắc chắn thẻ nhớ đã được cắm vào thiết bị");
-	fmt::println("CẢNH BÁO: Dữ liệu điểm danh được lưu trong thẻ nhớ trước đó sẽ bị xoá sạch");
+	fmt::print(fmt::fg(fmt::color::black) | fmt::bg(fmt::color::yellow), "CẢNH BÁO: Dữ liệu điểm danh được lưu trong thẻ nhớ trước đó sẽ bị xoá sạch\n");
 	fmt::println("Nếu bạn muốn lưu lại kết quả điểm danh trước đó, hãy khởi động lại phần mềm");
 	fmt::println("và chọn lựa chọn 5");
 
@@ -353,7 +374,7 @@ void DiemDanhKhongKetNoi()
 
 	if (WriteFile(hSerial, prepareCommand, sizeof(prepareCommand), &bytes_written, NULL))
 	{
-		fmt::println("Sau khi nhấn phím Enter, hãy rút thiết bị ra và cắm nguồn 9V vào thiết bị");
+		fmt::println("Sau khi rút thiết bị ra, hãy cắm nguồn 9V vào thiết bị");
 		fmt::println("Sau đó thực hiện việc quét thẻ điểm danh như bình thường\n");
 
 		fmt::println("Hãy rút thiết bị ra...\n");
@@ -377,7 +398,7 @@ void DiemDanhKhongKetNoi()
 	}
 	else
 	{
-		fmt::println("Lỗi khi gửi dữ liệu qua cổng COM. Hãy kiểm tra lại kết nối với thiết bị");
+		fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Lỗi khi gửi dữ liệu qua cổng COM. Hãy kiểm tra lại kết nối với thiết bị\n");
 
 		fmt::println("\nNhấn phím Enter để thoát...");
 		cin.get();
@@ -428,7 +449,7 @@ void MainInterface()
 	}
 	else
 	{
-		fmt::println("Lựa chọn không hợp lệ!");
+		fmt::print(fmt::fg(fmt::color::black) | fmt::bg(fmt::color::yellow), "Lựa chọn không hợp lệ!\n");
 		PauseAndBack();
 	}
 }
@@ -450,14 +471,13 @@ void PauseAndBack()
 
 int main()
 {
+	InitializeConsole();
+
 	ReadWriteCSV::GetPath();
 	ReadWriteCSV::InitializeCSV();
 	InitializeRFID();
 	SentStartupCommand();
-
-	//Đặt tiêu đề cho console (hiện trên đầu cửa sổ)
-	SetConsoleTitleW(L"Phần mềm điểm danh bằng thẻ sinh viên");
-
+	
 	MainInterface();
 
 	CloseHandle(hSerial);

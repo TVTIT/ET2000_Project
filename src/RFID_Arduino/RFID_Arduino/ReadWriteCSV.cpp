@@ -5,6 +5,7 @@
 #include "fmt/core.h"
 #include "fmt/base.h"
 #include "fmt/chrono.h"
+#include "fmt/color.h"
 #include <fcntl.h>
 #include <io.h>
 
@@ -128,7 +129,7 @@ void ReadWriteCSV::LuuDuLieuDiemDanh()
     v_students_isPresent.clear();
     v_students_isPresent.resize(studentCount + 1);
 
-    fmt::println("Đã lưu dữ liệu điểm danh vào file csv!");
+    fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "Đã lưu dữ liệu điểm danh vào file csv!\n");
 }
 
 /// <summary>
@@ -137,8 +138,9 @@ void ReadWriteCSV::LuuDuLieuDiemDanh()
 /// <param name="ID_Card">ID thẻ vừa quét được</param>
 void ReadWriteCSV::AddStudentToCSV(string ID_Card)
 {
-    fmt::println("ID thẻ vừa quét: " + ID_Card);
-    fmt::print("Nhập tên+ MSSV của sinh viên vừa quét: ");
+    fmt::print("ID thẻ vừa quét: ");
+    fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::gray), ID_Card + "\n");
+    fmt::print("Nhập tên + MSSV của sinh viên vừa quét: ");
 
     /* Đặt chế độ input UTF18 để nhập tên tiếng Việt có dấu, sau đó đặt lại
     chế độ ban đầu để tránh xung đột */
@@ -156,7 +158,7 @@ void ReadWriteCSV::AddStudentToCSV(string ID_Card)
 
     InitializeCSV();
 
-    fmt::println("Lưu thành công thông tin sinh viên!");
+    fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "Lưu thành công thông tin sinh viên!\n");
 }
 
 /// <summary>
@@ -187,16 +189,16 @@ void ReadWriteCSV::RemoveStudentFromCSV()
             Student_ListCSV.Save(ReadWriteCSV::DirectoryPath + "\\students_list.csv");
             ReadWriteCSV::InitializeCSV();
 
-            fmt::println("Xoá sinh viên thành công!");
+            fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "Xoá sinh viên thành công!\n");
         }
         else
         {
-            fmt::println("Số thứ tự không hợp lệ!");
+            fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Số thứ tự không hợp lệ!\n");
         }
         
     }
     catch (const std::exception&)
     {
-        fmt::println("Lựa chọn không hợp lệ!");
+        fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Lựa chọn không hợp lệ!\n");
     }
 }
