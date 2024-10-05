@@ -7,7 +7,7 @@
 #include <string.h>
 #include "rdm6300.h"
 
-#define RDM6300_TX_PIN 2        //Chân TX của RDM6300
+#define RDM6300_TX_PIN 2  //Chân TX của RDM6300
 //#define READ_LED_PIN 13         //Led có sẵn trên Arduino
 #define WRITE_BUZZER_PIN 7      //Chân + của còi buzzer
 #define SD_CARD_CHIP_SELECT 10  //Chân CS của module micro sd card spi
@@ -43,7 +43,7 @@ void loop() {
       digitalWrite(WRITE_BUZZER_PIN, HIGH);
       delay(50);
       digitalWrite(WRITE_BUZZER_PIN, LOW);
-    } else { //nếu chưa kết nối thì ghi id thẻ vào thẻ nhớ
+    } else {  //nếu chưa kết nối thì ghi id thẻ vào thẻ nhớ
       dataFile = SD.open("diemdanh.txt", FILE_WRITE);
       dataFile.print(rdm6300.get_tag_id(), HEX);
       dataFile.print("\n");
@@ -53,17 +53,21 @@ void loop() {
       delay(50);
       digitalWrite(WRITE_BUZZER_PIN, LOW);
     }
-  } else if (Serial.available() > 0) { //nếu nhận được lệnh từ serial
-    isCOMConnected = true; //chuyển trạng thái kết nối cổng COM
+  } else if (Serial.available() > 0) {  //nếu nhận được lệnh từ serial
+    isCOMConnected = true;              //chuyển trạng thái kết nối cổng COM
     String commandReceived = Serial.readString();
 
     //cần phải substring vì trong lệnh còn các ký tự kết thúc dòng
     if (commandReceived.substring(0, 12) == "printTXTFile") {
       dataFile = SD.open("diemdanh.txt", FILE_READ);
-
-      while (dataFile.available()) {
-        Serial.write(dataFile.read());
+      if (dataFile.size() == 0) {
+        Serial.print("sdcard_empty");
+      } else {
+        while (dataFile.available()) {
+          Serial.write(dataFile.read());
+        }
       }
+
     } else if (commandReceived.substring(0, 20) == "prepareForDisconnect") {
       SD.remove("diemdanh.txt");
       dataFile = SD.open("diemdanh.txt", FILE_WRITE);

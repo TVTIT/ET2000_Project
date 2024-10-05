@@ -283,6 +283,9 @@ void DiemDanh()
 	EnterHookThread.join();
 }
 
+/// <summary>
+/// Đọc dữ liệu từ file text trong thẻ nhớ và thực hiện điểm danh
+/// </summary>
 void ReadTXTFileInSDCard()
 {
 	ClearScreen();
@@ -301,40 +304,45 @@ void ReadTXTFileInSDCard()
 			if (dwBytesRead > 0) 
 			{
 				szBuff[dwBytesRead] = '\0';  // Kết thúc chuỗi
-				IDsCardFromTXT += szBuff;
-
-				stringstream stream_IDsCardFromTXT(IDsCardFromTXT);
-				string segment;
-				vector<string> IDsCardFromTXT_splited;
-
-				while (getline(stream_IDsCardFromTXT, segment, '\n'))
+				IDsCardFromTXT = szBuff;
+				
+				if (IDsCardFromTXT == "sdcard_empty")
 				{
-					IDsCardFromTXT_splited.push_back(segment);
+					fmt::print(fmt::fg(fmt::color::black) | fmt::bg(fmt::color::yellow), "Không có dữ liệu trong thẻ nhớ\n");
 				}
-
-				for (int i = 0; i < IDsCardFromTXT_splited.size(); i++)
+				else
 				{
-					bool isIDCardExists = false;
-					string student_name;
+					stringstream stream_IDsCardFromTXT(IDsCardFromTXT);
+					string segment;
+					vector<string> IDsCardFromTXT_splited;
 
-					ReadWriteCSV::GetStudentName(IDsCardFromTXT_splited[i], student_name, isIDCardExists);
-					if (isIDCardExists)
+					while (getline(stream_IDsCardFromTXT, segment, '\n'))
 					{
-						fmt::println(student_name + " đã điểm danh");
+						IDsCardFromTXT_splited.push_back(segment);
 					}
-					else
+
+					for (int i = 0; i < IDsCardFromTXT_splited.size(); i++)
 					{
-						fmt::println("ID thẻ {0} không nhận dạng được", IDsCardFromTXT_splited[i]);
+						bool isIDCardExists = false;
+						string student_name;
+
+						ReadWriteCSV::GetStudentName(IDsCardFromTXT_splited[i], student_name, isIDCardExists);
+						if (isIDCardExists)
+						{
+							fmt::println(student_name + " đã điểm danh");
+						}
+						else
+						{
+							fmt::println("ID thẻ {0} không nhận dạng được", IDsCardFromTXT_splited[i]);
+						}
 					}
+
+					fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "\nĐọc dữ liệu hoàn tất! Nhấn phím Enter để tổng hợp kết quả...\n");
+					cin.get();
+
+					ReadWriteCSV::InKetQuaDiemDanh();
+					ReadWriteCSV::LuuDuLieuDiemDanh();
 				}
-
-				fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "Đọc dữ liệu hoàn tất! Nhấn phím Enter để tổng hợp kết quả...\n");
-				cin.get();
-
-				ReadWriteCSV::InKetQuaDiemDanh();
-				ReadWriteCSV::LuuDuLieuDiemDanh();
-
-
 			}
 			else
 			{
@@ -358,6 +366,14 @@ void ReadTXTFileInSDCard()
 	}
 }
 
+/// <summary>
+/// Điểm danh không cần kết nối với máy tính
+/// Cách thức hoạt động:
+/// 1. Xoá dữ liệu điểm danh ở thẻ nhớ trước đó
+/// 2. Cắm pin 9V vào arduino rồi quét thẻ như bình thường
+/// 3. Sau khi hoàn tất, rút pin 9V rồi cắm arduino vào máy tính
+/// 4. Gọi hàm ReadTXTFileInSDCard() để đọc dữ liệu từ file text qua Serial
+/// </summary>
 void DiemDanhKhongKetNoi()
 {
 	ClearScreen();
