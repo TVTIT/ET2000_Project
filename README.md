@@ -26,6 +26,11 @@ Phần mềm không yêu cầu cài đặt. Bạn chỉ cần tải phiên bản
 ## Video giới thiệu và hướng dẫn sử dụng
 [Xem video trên YouTube](https://www.youtube.com/watch?v=lwuSDvUjh_Y)
 
+## Cấu trúc thư mục
+- `src\RFID_Arduino` Project của phần mềm kết nối với Arduino, khuyến khích nên mở bằng `Visual Studio 2022` hoặc phiên bản cao hơn
+- `src\RFID_RDM6300` Code để nạp vào Arduino nếu mạch không cắm Module `Micro SD Card SPI`
+- `src\RFID_RDM6300_SDCard` Code để nạp vào Arduino nếu mạch có cắm `Module Micro SD Card SPI`
+
 ## Các thành phần chính của mạch Arduino
 - Arduino UNO R3
 - Module RFID 125kHz RDM6300
