@@ -337,7 +337,9 @@ void ReadTXTFileInSDCard()
 						}
 					}
 
-					fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "\nĐọc dữ liệu hoàn tất! Nhấn phím Enter để tổng hợp kết quả...\n");
+					fmt::println("");
+					fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "Đọc dữ liệu hoàn tất! Nhấn phím Enter để tổng hợp kết quả...");
+					fmt::println("");
 					cin.get();
 
 					ReadWriteCSV::InKetQuaDiemDanh();
