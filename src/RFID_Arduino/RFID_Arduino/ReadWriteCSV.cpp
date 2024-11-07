@@ -129,7 +129,8 @@ void ReadWriteCSV::LuuDuLieuDiemDanh()
     v_students_isPresent.clear();
     v_students_isPresent.resize(studentCount + 1);
 
-    fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "Đã lưu dữ liệu điểm danh vào file csv!\n");
+    fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "Đã lưu dữ liệu điểm danh vào file csv!");
+    fmt::println("");
 }
 
 /// <summary>
@@ -152,7 +153,6 @@ void ReadWriteCSV::AddStudentToCSV(string ID_Card)
     string student_name = wstring_to_utf8(wstr_student_name);
 
     vector<string> newInfo = { student_name, ID_Card };
-    //rapidcsv::Document doc(ReadWriteCSV::DirectoryPath + "\\students_list.csv", rapidcsv::LabelParams(0, -1));
     Student_ListCSV.InsertRow(studentCount, newInfo);
     Student_ListCSV.Save(ReadWriteCSV::DirectoryPath + "\\students_list.csv");
 
@@ -189,16 +189,19 @@ void ReadWriteCSV::RemoveStudentFromCSV()
             Student_ListCSV.Save(ReadWriteCSV::DirectoryPath + "\\students_list.csv");
             ReadWriteCSV::InitializeCSV();
 
-            fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "Xoá sinh viên thành công!\n");
+            fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "Xoá sinh viên thành công!");
+            fmt::println("");
         }
         else
         {
             fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Số thứ tự không hợp lệ!\n");
+            fmt::println("");
         }
         
     }
     catch (const std::exception&)
     {
         fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Lựa chọn không hợp lệ!\n");
+        fmt::println("");
     }
 }

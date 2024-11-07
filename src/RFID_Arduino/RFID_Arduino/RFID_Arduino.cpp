@@ -252,18 +252,21 @@ void DiemDanh()
 				if (isIDCardExists)
 				{
 					//fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), student_name + " đã điểm danh vào lúc " + GetTimeNow(0) + "\n");
-					fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "{0} đã điểm danh vào lúc {1}\n", student_name, GetTimeNow(0));
+					fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "{0} đã điểm danh vào lúc {1}", student_name, GetTimeNow(0));
+					fmt::println("");
 				}
 				else
 				{
-					fmt::print(fmt::fg(fmt::color::black) | fmt::bg(fmt::color::yellow), "Không nhận dạng được thẻ sinh viên\n");
+					fmt::print(fmt::fg(fmt::color::black) | fmt::bg(fmt::color::yellow), "Không nhận dạng được thẻ sinh viên");
+					fmt::println("");
 				}
 
 			}
 		}
 		else
 		{
-			fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Lỗi khi đọc dữ liệu từ cổng COM. Hãy kiểm tra lại kết nối với thiết bị\n");
+			fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Lỗi khi đọc dữ liệu từ cổng COM. Hãy kiểm tra lại kết nối với thiết bị");
+			fmt::println("");
 			fmt::println("Đang lưu kết quả điểm danh...\n\n");
 			ReadWriteCSV::InKetQuaDiemDanh();
 			ReadWriteCSV::LuuDuLieuDiemDanh();
@@ -337,7 +340,9 @@ void ReadTXTFileInSDCard()
 						}
 					}
 
-					fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "\nĐọc dữ liệu hoàn tất! Nhấn phím Enter để tổng hợp kết quả...\n");
+					fmt::println("");
+					fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "Đọc dữ liệu hoàn tất! Nhấn phím Enter để tổng hợp kết quả...");
+					fmt::println("");
 					cin.get();
 
 					ReadWriteCSV::InKetQuaDiemDanh();
@@ -346,8 +351,8 @@ void ReadTXTFileInSDCard()
 			}
 			else
 			{
-				fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Lỗi khi đọc dữ liệu từ cổng COM. Hãy kiểm tra lại kết nối với thiết bị\n");
-
+				fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Lỗi khi đọc dữ liệu từ cổng COM. Hãy kiểm tra lại kết nối với thiết bị");
+				fmt::println("");
 				fmt::println("\nNhấn phím Enter để thử lại...");
 				cin.get();
 				ReadTXTFileInSDCard();
