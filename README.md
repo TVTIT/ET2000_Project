@@ -23,6 +23,11 @@ Phần mềm không yêu cầu cài đặt. Bạn chỉ cần tải phiên bản
 
    ![Ảnh chụp màn hình Device manager](manage_screenshot.png)
 
+## Đèn LED hiển thị trạng thái
+- Màu vàng: Thiết bị chưa được kết nối với phần mềm, khi quét thẻ sẽ lưu ID vào thẻ nhớ
+- Màu xanh: Thiết bị đã được kết nối với phần mềm, khi quét thẻ sẽ gửi ID thẻ đến phần mềm mà không lưu vào thẻ nhớ
+- Màu đỏ: Thiết bị mất kết nối với thẻ nhớ, mọi chức năng sẽ không hoạt động
+
 ## Video giới thiệu và hướng dẫn sử dụng
 [Xem video trên YouTube](https://www.youtube.com/watch?v=lwuSDvUjh_Y)
 
