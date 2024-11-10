@@ -1,5 +1,6 @@
 ﻿  RFID_Arduino.cpp
-  ReadWriteCSV.cpp
-D:\Hoc\ET2000 Project\src\RFID_Arduino\RFID_Arduino\ReadWriteCSV.cpp(72,43): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+D:\Hoc\ET2000 Project\src\RFID_Arduino\RFID_Arduino\RFID_Arduino.cpp(468,55): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+D:\Hoc\ET2000 Project\src\RFID_Arduino\RFID_Arduino\RFID_Arduino.cpp(470,63): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+  WifiConnection.cpp
   Generating Code...
   RFID_Arduino.vcxproj -> D:\Hoc\ET2000 Project\src\RFID_Arduino\x64\Debug\RFID_Arduino.exe

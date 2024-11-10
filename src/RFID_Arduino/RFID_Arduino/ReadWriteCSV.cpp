@@ -28,13 +28,13 @@ int studentCount;
 /// </summary>
 /// <param name="wstr">wstring cần convert</param>
 /// <returns></returns>
-string wstring_to_utf8(const wstring& wstr) 
-{
-    int size_needed = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, nullptr, 0, nullptr, nullptr);
-    string str(size_needed - 1, 0);  // Trừ đi 1 để bỏ ký tự null-terminator
-    WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, &str[0], size_needed, nullptr, nullptr);
-    return str;
-}
+//string wstring_to_utf8(const wstring& wstr) 
+//{
+//    int size_needed = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, nullptr, 0, nullptr, nullptr);
+//    string str(size_needed - 1, 0);  // Trừ đi 1 để bỏ ký tự null-terminator
+//    WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, &str[0], size_needed, nullptr, nullptr);
+//    return str;
+//}
 
 /// <summary>
 /// Lấy tên + MSSV của SV qua mã thẻ RFID
@@ -145,12 +145,14 @@ void ReadWriteCSV::AddStudentToCSV(string ID_Card)
 
     /* Đặt chế độ input UTF18 để nhập tên tiếng Việt có dấu, sau đó đặt lại
     chế độ ban đầu để tránh xung đột */
-    _setmode(_fileno(stdin), _O_U16TEXT);
-    wstring wstr_student_name;
-    getline(wcin, wstr_student_name);
-    _setmode(_fileno(stdin), _O_TEXT);
+    //_setmode(_fileno(stdin), _O_U16TEXT);
+    //wstring wstr_student_name;
+    //getline(wcin, wstr_student_name);
+    //_setmode(_fileno(stdin), _O_TEXT);
 
-    string student_name = wstring_to_utf8(wstr_student_name);
+    //string student_name = wstring_to_utf8(wstr_student_name);
+
+    string student_name = UnicodeInput();
 
     vector<string> newInfo = { student_name, ID_Card };
     Student_ListCSV.InsertRow(studentCount, newInfo);

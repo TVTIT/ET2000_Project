@@ -1,5 +1,4 @@
 ﻿#define FMT_HEADER_ONLY
-#include <windows.h>
 #include <iostream>
 #include <string>
 #include "rapidcsv.h"
@@ -8,12 +7,19 @@
 #include <thread>
 #include <fstream>
 #include <sstream>
+#include <fcntl.h>
+//#include <winsock2.h>
+//#include <ws2tcpip.h>
+//#pragma comment(lib, "ws2_32.lib")
+#include <windows.h>
+
 #include "ReadWriteCSV.h"
+#include "RFID_Arduino.h"
+#include "WifiConnection.h"
+
 using namespace std;
 
 void MainInterface();
-void PauseAndExit();
-void PauseAndBack();
 
 bool isContinue = true;
 wstring COM_Port;
@@ -60,6 +66,20 @@ void ClearScreen()
 
 	/* Move the cursor home */
 	SetConsoleCursorPosition(hStdOut, homeCoords);
+}
+
+string UnicodeInput()
+{
+	_setmode(_fileno(stdin), _O_U16TEXT);
+	wstring w_userInput;
+	getline(wcin, w_userInput);
+	_setmode(_fileno(stdin), _O_TEXT);
+
+	//Convert wstring sang string
+	int size_needed = WideCharToMultiByte(CP_UTF8, 0, w_userInput.c_str(), -1, nullptr, 0, nullptr, nullptr);
+	string s_userInput(size_needed - 1, 0);  // Trừ đi 1 để bỏ ký tự null-terminator
+	WideCharToMultiByte(CP_UTF8, 0, w_userInput.c_str(), -1, &s_userInput[0], size_needed, nullptr, nullptr);
+	return s_userInput;
 }
 
 /// <summary>
@@ -428,6 +448,63 @@ void DiemDanhKhongKetNoi()
 	}
 }
 
+void DiemDanhBangWifi()
+{
+	ClearScreen();
+	fmt::print("Nhập chính xác tên Wifi (chỉ hỗ trợ tên Wifi không dấu): ");
+	string Wifi_SSID = UnicodeInput();
+	fmt::print("Nhập chính xác mật khẩu Wifi: ");
+	string Wifi_Password = UnicodeInput();
+
+	fmt::println("\nKiểm tra chính xác tên và mật khẩu Wifi, nếu đúng thì nhấn Enter để tiếp tục...");
+	cin.get();
+
+	fmt::println("Đang gửi tên và mật khẩu Wifi đến thiết bị...");
+	char wifiCommand[] = "connectWifi";
+	DWORD bytes_written;
+	if (WriteFile(hSerial, wifiCommand, sizeof(wifiCommand), &bytes_written, NULL))
+	{
+		Sleep(2000);
+		WriteFile(hSerial, Wifi_SSID.c_str(), Wifi_SSID.size(), &bytes_written, NULL);
+		Sleep(2000);
+		WriteFile(hSerial, Wifi_Password.c_str(), Wifi_Password.size(), &bytes_written, NULL);
+		Sleep(1000);
+	}
+
+	fmt::println("Đang kết nối Wifi...");
+	char szBuff[100];
+	DWORD dwBytesRead = 0;
+	string IP = "";
+	while (ReadFile(hSerial, szBuff, sizeof(szBuff) - 1, &dwBytesRead, NULL))
+	{
+		if (dwBytesRead > 0)
+		{
+			szBuff[dwBytesRead] = '\0';
+			IP = szBuff;
+			if (IP == "wifiError")
+			{
+				fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Kết nối Wifi không thành công. Hãy kiếm tra lại tên và mật khẩu Wifi");
+				fmt::println("");
+				PauseAndBack();
+				return;
+			}
+			
+			fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "kết nối Wifi thành công!");
+			fmt::println("");
+			fmt::println("Địa chỉ IP của thiết bị: " + IP);
+			fmt::println("\nHãy rút thiết bị ra...\n");
+		}
+	}
+
+	fmt::println("Kết nối thiết bị với nguồn 9V, sau khi đèn chuyển sang màu xanh dương");
+	fmt::println("thì nhấn Enter để tiếp tục...");
+	cin.get();
+
+	ClearScreen();
+	WifiConnection::Connect(IP);
+	PauseAndBack();
+}
+
 void MainInterface()
 {
 	ClearScreen();
@@ -437,7 +514,8 @@ void MainInterface()
 	fmt::println("[3] Xoá thành viên khỏi lớp học");
 	fmt::println("[4] Thực hiện điểm danh khi không kết nối máy tính");
 	fmt::println("[5] Đọc dữ liệu trong thẻ nhớ và điểm danh");
-	fmt::println("[6] Thoát");
+	fmt::println("[6] Điểm danh sử dụng cùng 1 mạng Wifi");
+	fmt::println("[7] Thoát");
 	fmt::print("Nhập lựa chọn của bạn: ");
 
 	getline(cin, user_input);
@@ -465,6 +543,10 @@ void MainInterface()
 		PauseAndBack();
 	}
 	else if (user_input == "6")
+	{
+		DiemDanhBangWifi();
+	}
+	else if (user_input == "7")
 	{
 
 	}

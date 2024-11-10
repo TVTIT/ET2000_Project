@@ -24,6 +24,9 @@
     <ClCompile Include="ReadWriteCSV.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WifiConnection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="rapidcsv.h">
@@ -76,6 +79,9 @@
     </ClInclude>
     <ClInclude Include="fmt\xchar.h">
       <Filter>Header Files\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="WifiConnection.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
