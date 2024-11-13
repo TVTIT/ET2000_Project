@@ -68,6 +68,7 @@ void connectWifi(bool isStartup) {
   const char* WIFI_PASSWORD = readFile(FILE_WIFI_PASSWORD);
 
   WiFi.disconnect();
+  WiFi.hostname("ESP-DiemDanh");  //Fix 1 số wifi khó
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
   int startAttemptTime = millis();
@@ -129,12 +130,19 @@ void loop() {
       while (client.connected()) {
         if (rdm6300.get_new_tag_id()) {
           client.print(rdm6300.get_tag_id(), HEX);
+          client.print("\n");
           digitalWrite(WRITE_BUZZER_PIN, HIGH);
           delay(50);
           digitalWrite(WRITE_BUZZER_PIN, LOW);
+        } else if (client.available()) {
+          if (client.readStringUntil('\n') == "disconectWifi") writeFile("/IsUsingWifi.txt", "0");
+        } 
+        else {
+          client.print("stillConnected\n");
+          delay(100);
         }
       }
-      writeFile("/IsUsingWifi.txt", "0");
+      changeLedColor(!isWifiConnected * 170, !isWifiConnected * 255, isWifiConnected * 255);
     }
   }
 
@@ -143,7 +151,11 @@ void loop() {
     if (isCOMConnected) {
       Serial.print(rdm6300.get_tag_id(), HEX);
     } else {
-      writeFile(FILE_DIEM_DANH, String(rdm6300.get_tag_id(), HEX).c_str());
+      String ID = String(rdm6300.get_tag_id(), HEX);
+      ID.toUpperCase();
+      File fileDiemDanh = LittleFS.open(FILE_DIEM_DANH, "a");
+      fileDiemDanh.print(ID + "\n");
+      fileDiemDanh.close();
     }
     digitalWrite(WRITE_BUZZER_PIN, HIGH);
     delay(50);
@@ -160,20 +172,26 @@ void loop() {
       while (Serial.available() <= 0) {
         delay(10);
       }
-      writeFile(FILE_WIFI_PASSWORD, Serial.readString().c_str());
+      String password = Serial.readString();
+      if (password == "null") {
+        password = "";
+      }
+      writeFile(FILE_WIFI_PASSWORD, password.c_str());
 
       writeFile(FILE_IS_USING_WIFI, "1");
 
       connectWifi(false);
     } else if (commandReceived == "printTXTFile") {
-      const char* content = readFile(FILE_DIEM_DANH);
-      if (sizeof(content) == 0) {
+      File fileDiemDanh = LittleFS.open(FILE_DIEM_DANH, "r");
+      if (fileDiemDanh.size() == 0) {
         Serial.print("sdcard_empty");
       } else {
-        Serial.print(content);
+        while (fileDiemDanh.available()) {
+          Serial.write(fileDiemDanh.read());
+        }
       }
+      fileDiemDanh.close();
     } else if (commandReceived == "prepareForDisconnect") {
-      LittleFS.remove(FILE_DIEM_DANH);
       writeFile(FILE_DIEM_DANH, "");
     }
   }

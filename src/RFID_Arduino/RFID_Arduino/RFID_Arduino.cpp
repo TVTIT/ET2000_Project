@@ -456,6 +456,9 @@ void DiemDanhBangWifi()
 	fmt::print("Nhập chính xác mật khẩu Wifi: ");
 	string Wifi_Password = UnicodeInput();
 
+	if (Wifi_Password == "")
+		Wifi_Password = "null";
+
 	fmt::println("\nKiểm tra chính xác tên và mật khẩu Wifi, nếu đúng thì nhấn Enter để tiếp tục...");
 	cin.get();
 
@@ -515,7 +518,8 @@ void MainInterface()
 	fmt::println("[4] Thực hiện điểm danh khi không kết nối máy tính");
 	fmt::println("[5] Đọc dữ liệu trong thẻ nhớ và điểm danh");
 	fmt::println("[6] Điểm danh sử dụng cùng 1 mạng Wifi");
-	fmt::println("[7] Thoát");
+	fmt::println("[7] Kết nối lại với thiết bị qua Wifi");
+	fmt::println("[8] Thoát");
 	fmt::print("Nhập lựa chọn của bạn: ");
 
 	getline(cin, user_input);
@@ -547,6 +551,12 @@ void MainInterface()
 		DiemDanhBangWifi();
 	}
 	else if (user_input == "7")
+	{
+		ClearScreen();
+		fmt::print("Nhập địa chỉ IP của thiết bị: ");
+		WifiConnection::Connect(UnicodeInput());
+	}
+	else if (user_input == "8")
 	{
 
 	}
