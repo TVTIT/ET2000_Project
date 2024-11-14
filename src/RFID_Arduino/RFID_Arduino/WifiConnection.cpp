@@ -66,7 +66,7 @@ void WifiConnection::Connect(string IP) {
     FD_ZERO(&readfds);
 
     timeval timeout;
-    timeout.tv_sec = 3; //Nhớ chỉnh lại
+    timeout.tv_sec = 3;
     timeout.tv_usec = 0;
 
     fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "Kết nối với thiết bị thành công!\n");
@@ -136,7 +136,6 @@ void WifiConnection::Connect(string IP) {
     ClearScreen();
     ReadWriteCSV::InKetQuaDiemDanh();
     ReadWriteCSV::LuuDuLieuDiemDanh();
-    PauseAndBack();
     EnterHookThread.join();
 }
 

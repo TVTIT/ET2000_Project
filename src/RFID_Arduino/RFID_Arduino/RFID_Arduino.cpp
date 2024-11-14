@@ -21,7 +21,7 @@ using namespace std;
 
 void MainInterface();
 
-bool isContinue = true;
+bool isContinue = true, lastCOMConnection = false;
 wstring COM_Port;
 
 HANDLE hSerial;
@@ -107,6 +107,11 @@ void HookEnter()
 	isContinue = false;
 }
 
+void SentStartupCommand()
+{
+	WriteFile(hSerial, "startup", 8, NULL, NULL);
+}
+
 /// <summary>
 /// Khởi tạo kết nối với module
 /// </summary>
@@ -121,15 +126,18 @@ void InitializeRFID()
 		getline(COM_Port_File, COM_Port);
 	}
 
+	if (lastCOMConnection) CloseHandle(hSerial);
+
 	hSerial = CreateFile(COM_Port.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 
 	if (hSerial == INVALID_HANDLE_VALUE)
 	{
 		fmt::print(fmt::fg(fmt::color::black) | fmt::bg(fmt::color::yellow), "Không thể kết nối cổng COM. Hãy kiểm tra lại kết nối với thiết bị và nhập đúng cổng COM\n\n");
 		fmt::println("Chuột phải vào This PC -> Manage -> Device Manager -> Ports (COM & LPT)");
-		//fmt::print("Tìm tên Arduino UNO rồi nhập tên cổng vào (COMx): ");
 		fmt::print("Tìm tên ");
 		fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::gray), "Arduino UNO");
+		fmt::print(" hoặc ");
+		fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::gray), "USB-SERIAL CH340");
 		fmt::print(" rồi nhập tên cổng vào (COMx): ");
 		getline(wcin, COM_Port);
 		COM_Port_File.close();
@@ -137,7 +145,9 @@ void InitializeRFID()
 		COM_Port_File << COM_Port;
 		COM_Port_File.close();
 
+		lastCOMConnection = false;
 		InitializeRFID();
+		return;
 	}
 
 	// Cài đặt cấu hình serial
@@ -171,13 +181,12 @@ void InitializeRFID()
 		fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Không thể cài đặt timeout\n");
 		PauseAndExit();
 	}
-}
 
-void SentStartupCommand()
-{
-	char startupCommand[] = "startup";
-	DWORD bytes_written;
-	WriteFile(hSerial, startupCommand, sizeof(startupCommand), &bytes_written, NULL);
+	if (!lastCOMConnection)
+	{
+		SentStartupCommand();
+		lastCOMConnection = true;
+	}
 }
 
 /// <summary>
@@ -426,7 +435,7 @@ void DiemDanhKhongKetNoi()
 		{
 
 		}
-		CloseHandle(hSerial);
+		//CloseHandle(hSerial);
 
 		fmt::println("Khi thực hiện điểm danh xong, kết nối lại thiết bị");
 		fmt::println("rồi nhấn Enter (hoặc chọn lựa chọn 5 ở màn hình chính)\n");
@@ -473,6 +482,15 @@ void DiemDanhBangWifi()
 		WriteFile(hSerial, Wifi_Password.c_str(), Wifi_Password.size(), &bytes_written, NULL);
 		Sleep(1000);
 	}
+	else
+	{
+		fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Lỗi khi gửi dữ liệu qua cổng COM. Hãy kiểm tra lại kết nối với thiết bị\n");
+
+		fmt::println("\nNhấn phím Enter để thoát...");
+		cin.get();
+
+		exit(1);
+	}
 
 	fmt::println("Đang kết nối Wifi...");
 	char szBuff[100];
@@ -499,6 +517,8 @@ void DiemDanhBangWifi()
 		}
 	}
 
+	//CloseHandle(hSerial);
+
 	fmt::println("Kết nối thiết bị với nguồn 9V, sau khi đèn chuyển sang màu xanh dương");
 	fmt::println("thì nhấn Enter để tiếp tục...");
 	cin.get();
@@ -510,6 +530,7 @@ void DiemDanhBangWifi()
 
 void MainInterface()
 {
+	InitializeRFID();
 	ClearScreen();
 	string user_input = "";
 	fmt::println("[1] Thực hiện điểm danh");
@@ -555,6 +576,7 @@ void MainInterface()
 		ClearScreen();
 		fmt::print("Nhập địa chỉ IP của thiết bị: ");
 		WifiConnection::Connect(UnicodeInput());
+		PauseAndBack();
 	}
 	else if (user_input == "8")
 	{
@@ -588,8 +610,6 @@ int main()
 
 	ReadWriteCSV::GetPath();
 	ReadWriteCSV::InitializeCSV();
-	InitializeRFID();
-	SentStartupCommand();
 	
 	MainInterface();
 
