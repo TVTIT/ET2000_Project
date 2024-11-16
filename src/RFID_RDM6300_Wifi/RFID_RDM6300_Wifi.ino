@@ -120,7 +120,10 @@ void loop() {
     delay(10000);
   }
 
-  changeLedColor(!isWifiConnected * 170, !isWifiConnected * 255, isWifiConnected * 255);
+  //blue: đã kết nối wifi nhưng đang đợi
+  //vàng = red + green: chưa kết nối COM
+  //tím = red + blue: Đã kết nối COM
+  changeLedColor(!isWifiConnected * 170, !(isWifiConnected || isCOMConnected) * 255, (isWifiConnected || isCOMConnected) * 255);
 
   if (isWifiConnected) {
     client = server.available();  // Chờ client kết nối
