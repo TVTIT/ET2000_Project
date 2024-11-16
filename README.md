@@ -8,39 +8,37 @@ Dự án này phát triển phần mềm và thiết kế một thiết bị đi
 Mục tiêu của dự án là tạo ra một hệ thống dễ sử dụng, có thể áp dụng trong các trường học, lớp học hoặc các sự kiện đông người. Thiết bị có tính ứng dụng cao, hỗ trợ quản lý thông tin điểm danh hiệu quả.
 
 ## Yêu cầu hệ thống
-- Máy tính chạy hệ điều hành Windows (khuyến nghị Windows 10 trở lên)
+Máy tính chạy hệ điều hành Windows (khuyến nghị Windows 10 trở lên)
 
 ## Cách cài đặt
 Phần mềm không yêu cầu cài đặt. Bạn chỉ cần tải phiên bản mới nhất tại phần [Release](https://github.com/TVTIT/ET2000_Project/releases/latest), giải nén file và chạy file `RFID_Arduino.exe`.
 
-## Hướng dẫn sử dụng
-1. Kết nối thiết bị với máy tính và mở phần mềm.
-2. Lần đầu tiên, phần mềm sẽ yêu cầu bạn nhập cổng COM của Arduino. Để kiểm tra:
-   - Chuột phải vào `This PC` -> `Manage` -> `Device Manager` -> `Ports (COM & LPT)`.
-   - Tìm tên Arduino UNO và nhập cổng COM vào phần mềm.
+## Hướng dẫn sử dụng phần mềm  
+1. **Kết nối thiết bị**: Kết nối thiết bị với máy tính qua cổng USB.  
+2. **Chạy phần mềm**: Mở `RFID_Arduino.exe`.  
+3. **Xác định cổng COM của Arduino**:  
+   - Chuột phải vào `This PC` → `Manage` → `Device Manager`.  
+   - Tìm `Ports (COM & LPT)` và nhập đúng cổng COM hiển thị tên `Arduino Uno` hoặc `USB-SERIAL CH340` vào phần mềm.  
+4. Các lần sau, phần mềm sẽ tự động ghi nhớ thông tin và chỉ hỏi lại khi thay đổi cổng COM.
 
-   Các lần sau, phần mềm sẽ tự động ghi nhớ và không hỏi lại.
+![Ảnh chụp màn hình Device manager](manage_screenshot.png)
 
-   ![Ảnh chụp màn hình Device manager](manage_screenshot.png)
+## Cấu trúc thư mục  
+- **`src\RFID_Arduino`**: Code của phần mềm kết nối Arduino.  
+  *Khuyến nghị mở bằng `Visual Studio 2022` hoặc phiên bản cao hơn.*  
+- **`src\RFID_RDM6300`**: Code cho `Arduino UNO R3` **không** sử dụng `module micro SD Card`.  
+- **`src\RFID_RDM6300_SDCard`**: Code cho `Arduino UNO R3` sử dụng `module micro SD Card`.  
+- **`src\RFID_RDM6300_Wifi`**: Code dành cho `Wemos D1 Wifi ESP8266`.
 
-## Đèn LED hiển thị trạng thái
-- Màu vàng: Thiết bị chưa được kết nối với phần mềm, khi quét thẻ sẽ lưu ID vào thẻ nhớ
-- Màu xanh: Thiết bị đã được kết nối với phần mềm, khi quét thẻ sẽ gửi ID thẻ đến phần mềm mà không lưu vào thẻ nhớ
-- Màu đỏ: Thiết bị mất kết nối với thẻ nhớ, mọi chức năng sẽ không hoạt động
+## Mạch sử dụng Arduino UNO R3
+[Xem chi tiết tại đây](Arduino_UNO_R3.md)
 
-## Video giới thiệu và hướng dẫn sử dụng
-[Xem video trên YouTube](https://www.youtube.com/watch?v=lwuSDvUjh_Y)
+## Mạch sử dụng Wemos D1 Wifi ESP8266 và hướng dẫn cài đặt driver
+[Xem chi tiết tại đây](Wemos_D1_Wifi.md)
 
-## Cấu trúc thư mục
-- `src\RFID_Arduino` Project của phần mềm kết nối với Arduino, khuyến khích nên mở bằng `Visual Studio 2022` hoặc phiên bản cao hơn
-- `src\RFID_RDM6300` Code để nạp vào Arduino nếu mạch không cắm `Module Micro SD Card SPI`
-- `src\RFID_RDM6300_SDCard` Code để nạp vào Arduino nếu mạch có cắm `Module Micro SD Card SPI`
-
-## Các thành phần chính của mạch Arduino
-- Arduino UNO R3
-- Module RFID 125kHz RDM6300
-- Module Micro SD Card SPI
-- Pin 9V
-
-## Sơ đồ lắp mạch
-![Hình ảnh sơ đồ lắp mạch](Sơ_đồ_mạch.png)
+## Về chúng tôi
+Dự án này được thiết kế và xây dựng bởi nhóm 3, lớp 153333 môn Nhập môn Kỹ thuật Điện tử viễn thông (ET2000) của Trường Điện - Điện tử, Đại học Bách khoa Hà Nội học kì 2024.1. Nhóm chúng tôi bao gồm:
+- Nguyễn Khắc Tuấn Anh
+- Nguyễn Quý Bách
+- Đỗ Minh Hiếu
+- Trần Vĩnh Trung
