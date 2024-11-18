@@ -34,7 +34,7 @@ Phần mềm không yêu cầu cài đặt. Bạn chỉ cần tải phiên bản
 [Xem chi tiết tại đây](Arduino_UNO_R3.md)
 
 ## Mạch sử dụng Wemos D1 Wifi ESP8266 và hướng dẫn cài đặt driver
-[Xem chi tiết tại đây](Wemos_D1_Wifi.md)
+[Xem chi tiết tại đây](Wemos_ESP8266.md)
 
 ## Về chúng tôi
 Dự án này được thiết kế và xây dựng bởi nhóm 3, lớp 153333 môn Nhập môn Kỹ thuật Điện tử viễn thông (ET2000) của Trường Điện - Điện tử, Đại học Bách khoa Hà Nội học kì 2024.1. Nhóm chúng tôi bao gồm:
