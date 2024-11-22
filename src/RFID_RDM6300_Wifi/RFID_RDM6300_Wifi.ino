@@ -1,18 +1,19 @@
 //Code sử dụng thư viện RDM6300 của arduino12 lấy từ Github
-//Code nạp vào Arduino UNO R3 kết nối với moudle RDM6300 và còi chip để thực hiện
+//và thư viện LCDI2C_Vietnamese thuộc thư viện LiquidCrystal_I2C_Multilingual của locple (cần cài vào Arduino IDE)
+//Code nạp vào Wemos D1 Wifi ESP8266 kết nối với moudle RDM6300 và còi chip để thực hiện
 //đọc và lấy ID thẻ RFID 125khz
 
 #include <ESP8266WiFi.h>
 #include <FS.h>
 #include <LittleFS.h>
+#include <LCDI2C_Vietnamese.h>
 #include "rdm6300.h"
 
-#define RDM6300_TX_PIN 2  //Chân TX của RDM6300
-//#define READ_LED_PIN 13         //Led có sẵn trên Arduino
-#define WRITE_BUZZER_PIN 15  //Chân + của còi buzzer
-#define GREEN_LED_RGB 5      //Chân xanh lá của led rgb
-#define RED_LED_RGB 16       //Chân đỏ của led rgb
-#define BLUE_LED_RGB 4       //Chân xanh dương của led rgb
+#define RDM6300_TX_PIN D9  //Chân TX của RDM6300
+#define WRITE_BUZZER_PIN D10  //Chân + của còi buzzer
+#define GREEN_LED_RGB D6      //Chân xanh lá của led rgb
+#define RED_LED_RGB D5        //Chân đỏ của led rgb
+#define BLUE_LED_RGB D7       //Chân xanh dương của led rgb
 
 #define FILE_WIFI_SSID "/WiFiSSID.txt"          //File chứa ssid của wifi
 #define FILE_WIFI_PASSWORD "/WiFiPassword.txt"  //File chứa password wifi
@@ -20,9 +21,13 @@
 #define FILE_DIEM_DANH "/diemdanh.txt"
 
 Rdm6300 rdm6300;
+LCDI2C_Vietnamese lcd(0x27, 16, 2);
 bool isCOMConnected = false, isFlashError = false, isUsingWifi = false, isWifiConnected = false;
+String previousTextLCD = "";
+int printLCDTime = 0;
+bool showFirstInfo = true;
 
-// char* WIFI_SSID;
+char* WIFI_SSID;
 // char* WIFI_PASSWORD;
 
 WiFiServer server(1234);  // Tạo server trên cổng 1234
@@ -61,16 +66,25 @@ char* readFile(const char* filePath) {
   return text;
 }
 
+void printAndScrollLCD(String text) {
+  if (previousTextLCD == text) return;
+  previousTextLCD = text;
+  lcd.setCursor(0, 0);
+  lcd.clear();
+  lcd.print(text);
+}
+
 void connectWifi(bool isStartup) {
   changeLedColor(255, 0, 0);
   // Đọc dữ liệu từ tệp
-  const char* WIFI_SSID = readFile(FILE_WIFI_SSID);
+  WIFI_SSID = readFile(FILE_WIFI_SSID);
   const char* WIFI_PASSWORD = readFile(FILE_WIFI_PASSWORD);
 
   WiFi.disconnect();
   WiFi.hostname("ESP-DiemDanh");  //Fix 1 số wifi khó
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
+  printAndScrollLCD("Đang kết nối Wifi...");
   int startAttemptTime = millis();
   while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < 10000) {
     delay(100);
@@ -92,6 +106,9 @@ void connectWifi(bool isStartup) {
 
 void setup() {
   Serial.begin(9600);
+
+  lcd.init();
+  lcd.backlight();
 
   pinMode(WRITE_BUZZER_PIN, OUTPUT);
   pinMode(GREEN_LED_RGB, OUTPUT);
@@ -124,26 +141,57 @@ void loop() {
   //vàng = red + green: chưa kết nối COM
   //tím = red + blue: Đã kết nối COM
   changeLedColor(!isWifiConnected * 170, !(isWifiConnected || isCOMConnected) * 255, (isWifiConnected || isCOMConnected) * 255);
+  if (isWifiConnected) {
+    String wifiSSID = WIFI_SSID;
+    if (millis() - printLCDTime >= 2000) {
+      printLCDTime = millis();
+      if (showFirstInfo) {
+        String str_wifiSSID = WIFI_SSID;
+        printAndScrollLCD("Đã kết nối Wifi:" + str_wifiSSID);
+      } else {
+        printAndScrollLCD("Địa chỉ IP: " + WiFi.localIP().toString());
+      }
+      showFirstInfo = !showFirstInfo;
+    }
+  } else if (isCOMConnected) {
+    printAndScrollLCD("Đã kết nối phần mềm");
+  } else {
+    printAndScrollLCD("Chưa kết nối phần mềm/Wifi");
+  }
 
   if (isWifiConnected) {
     client = server.available();  // Chờ client kết nối
 
     if (client) {
-      changeLedColor(0, 255, 0);
       while (client.connected()) {
+        changeLedColor(0, 255, 0);
+        if (millis() - printLCDTime >= 2000) printAndScrollLCD("Đã kết nối phần mềm qua Wifi");
         if (rdm6300.get_new_tag_id()) {
           client.print(rdm6300.get_tag_id(), HEX);
           client.print("\n");
           digitalWrite(WRITE_BUZZER_PIN, HIGH);
           delay(50);
           digitalWrite(WRITE_BUZZER_PIN, LOW);
+          continue;
         } else if (client.available()) {
-          if (client.readStringUntil('\n') == "disconectWifi") writeFile("/IsUsingWifi.txt", "0");
-        } 
-        else {
-          client.print("stillConnected\n");
-          delay(100);
+          char buffer[32];
+          int i = 0;
+          while (client.available()) {
+            buffer[i] = client.read();
+            i++;
+          }
+          buffer[i] = '\0';
+          if (strncmp(buffer, "disconectWifi", 13) == 0) writeFile("/IsUsingWifi.txt", "0");
+          else if (strncmp(buffer, "noStudentAvail", 14) == 0) {
+            printAndScrollLCD("Ko nhận dạng đc thẻ s.viên");
+            printLCDTime = millis();
+          } else {
+            printAndScrollLCD(String(buffer) + " đã điểm danh");
+            printLCDTime = millis();
+          }
         }
+        client.print("stillConnected\n");
+        delay(100);
       }
       changeLedColor(!isWifiConnected * 170, !isWifiConnected * 255, isWifiConnected * 255);
     }

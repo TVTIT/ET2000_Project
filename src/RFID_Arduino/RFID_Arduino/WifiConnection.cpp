@@ -22,6 +22,10 @@ bool WifiConnection::isContinue = true;
 bool WifiConnection::lastConnectionError = false;
 SOCKET sock;
 
+/// <summary>
+/// Kết nối với ESP8266 bằng giao thức TCP qua cổng 1234
+/// </summary>
+/// <param name="IP">IP của ESP8266</param>
 void WifiConnection::Connect(string IP) {
     //Khởi tạo Winsock
     WSAData data;
@@ -114,11 +118,23 @@ void WifiConnection::Connect(string IP) {
                 {
                     fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "{0} đã điểm danh vào lúc {1}", student_name, GetTimeNow(0));
                     fmt::println("");
+                    stringstream stream_student_name(student_name);
+                    string segment;
+                    vector<string> student_name_splited;
+
+                    while (getline(stream_student_name, segment, ' '))
+                    {
+                        student_name_splited.push_back(segment);
+                    }
+                    //Gửi MSSV đến thiết bị
+                    send(sock, student_name_splited[student_name_splited.size() - 1].c_str(), student_name_splited[student_name_splited.size() - 1].size(), 0);
                 }
                 else
                 {
                     fmt::print(fmt::fg(fmt::color::black) | fmt::bg(fmt::color::yellow), "Không nhận dạng được thẻ sinh viên");
                     fmt::println("");
+                    //Gửi thông báo k có sinh viên
+                    send(sock, "noStudentAvail", 15, 0);
                 }
             }
         }
@@ -139,6 +155,9 @@ void WifiConnection::Connect(string IP) {
     EnterHookThread.join();
 }
 
+/// <summary>
+/// Dùng để ngắt kết nối khi nhấn Enter
+/// </summary>
 void WifiConnection::HookEnter()
 {
     string temp;
@@ -146,7 +165,7 @@ void WifiConnection::HookEnter()
 
     if (!lastConnectionError)
     {
-        int sendResult = send(sock, "disconectWifi\n", 15, 0);
+        int sendResult = send(sock, "disconectWifi", 14, 0);
         Sleep(100);
     }
     
@@ -155,6 +174,10 @@ void WifiConnection::HookEnter()
     WSACleanup();
 }
 
+/// <summary>
+/// Kết nối lại với ESP8266 khi mất kết nối
+/// </summary>
+/// <param name="IP">IP của ESP8266</param>
 void WifiConnection::Reconnect(string IP)
 {
     WSAData re_data;

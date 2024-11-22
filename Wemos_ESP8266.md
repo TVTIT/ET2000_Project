@@ -29,6 +29,7 @@ Trong hầu hết trường hợp, Windows sẽ tự nhận diện và cài đ�
 - **Wemos D1 Wifi ESP8266**: Bộ vi điều khiển và kết nối Wifi cho thiết bị.
 - **Module RFID 125kHz RDM6300**: Dùng để đọc ID từ thẻ sinh viên.
 - **Còi chip 5V**: Phát tín hiệu âm thanh khi quét thẻ thành công.
+- **Màn hình LCD 1602**: Hiển thị trạng thái thiết bị, thông tin thẻ sinh viên quét được.
 - **Đèn LED RGB**: Hiển thị trạng thái hoạt động của thiết bị.
 - **Pin 9V** (2 hoặc 3 viên lắp song song): Cung cấp nguồn cho thiết bị.
 
