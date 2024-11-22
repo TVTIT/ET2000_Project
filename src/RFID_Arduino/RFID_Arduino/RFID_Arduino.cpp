@@ -138,16 +138,30 @@ void InitializeRFID()
 		fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::gray), "Arduino UNO");
 		fmt::print(" hoặc ");
 		fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::gray), "USB-SERIAL CH340");
-		fmt::print(" rồi nhập tên cổng vào (COMx): ");
+		fmt::println(" rồi nhập tên cổng vào (COMx)\n");
+		fmt::println("Hoặc nhập 7 để kết nối lại với thiết bị qua Wifi");
+		fmt::print("Nhập cổng COM hoặc 7: ");
 		getline(wcin, COM_Port);
-		COM_Port_File.close();
-		COM_Port_File.open(ReadWriteCSV::DirectoryPath + "\\COM_Port.dat", std::ofstream::out | std::ofstream::trunc);
-		COM_Port_File << COM_Port;
-		COM_Port_File.close();
+		if (COM_Port == L"7")
+		{
+			ClearScreen();
+			ClearScreen();
+			fmt::print("Nhập địa chỉ IP của thiết bị: ");
+			WifiConnection::Connect(UnicodeInput());
+			PauseAndBack();
+			return;
+		}
+		else
+		{
+			COM_Port_File.close();
+			COM_Port_File.open(ReadWriteCSV::DirectoryPath + "\\COM_Port.dat", std::ofstream::out | std::ofstream::trunc);
+			COM_Port_File << COM_Port;
+			COM_Port_File.close();
 
-		lastCOMConnection = false;
-		InitializeRFID();
-		return;
+			lastCOMConnection = false;
+			InitializeRFID();
+			return;
+		}
 	}
 
 	// Cài đặt cấu hình serial
@@ -321,7 +335,7 @@ void DiemDanh()
 void ReadTXTFileInSDCard()
 {
 	ClearScreen();
-	fmt::println("Đang đọc dữ liệu từ thẻ nhớ...\n");
+	fmt::println("Đang đọc dữ liệu từ bộ nhớ...\n");
 
 	char printCommand[] = "printTXTFile";
 	DWORD bytes_written;
@@ -411,8 +425,8 @@ void ReadTXTFileInSDCard()
 void DiemDanhKhongKetNoi()
 {
 	ClearScreen();
-	fmt::println("Hãy chắc chắn thẻ nhớ đã được cắm vào thiết bị");
-	fmt::print(fmt::fg(fmt::color::black) | fmt::bg(fmt::color::yellow), "CẢNH BÁO: Dữ liệu điểm danh được lưu trong thẻ nhớ trước đó sẽ bị xoá sạch\n");
+	fmt::println("Hãy chắc chắn thẻ nhớ đã được cắm vào thiết bị (đối với Arduino)");
+	fmt::print(fmt::fg(fmt::color::black) | fmt::bg(fmt::color::yellow), "CẢNH BÁO: Dữ liệu điểm danh được lưu trong bộ nhớ trước đó sẽ bị xoá sạch\n");
 	fmt::println("Nếu bạn muốn lưu lại kết quả điểm danh trước đó, hãy khởi động lại phần mềm");
 	fmt::println("và chọn lựa chọn 5");
 
@@ -537,7 +551,7 @@ void MainInterface()
 	fmt::println("[2] Thêm thành viên vào lớp học");
 	fmt::println("[3] Xoá thành viên khỏi lớp học");
 	fmt::println("[4] Thực hiện điểm danh khi không kết nối máy tính");
-	fmt::println("[5] Đọc dữ liệu trong thẻ nhớ và điểm danh");
+	fmt::println("[5] Đọc dữ liệu trong bộ nhớ và điểm danh");
 	fmt::println("[6] Điểm danh sử dụng cùng 1 mạng Wifi");
 	fmt::println("[7] Kết nối lại với thiết bị qua Wifi");
 	fmt::println("[8] Thoát");
@@ -575,6 +589,7 @@ void MainInterface()
 	{
 		ClearScreen();
 		fmt::print("Nhập địa chỉ IP của thiết bị: ");
+		fmt::println("Đang kết nối...");
 		WifiConnection::Connect(UnicodeInput());
 		PauseAndBack();
 	}
