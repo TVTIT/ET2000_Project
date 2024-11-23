@@ -7,8 +7,19 @@ Dự án này phát triển phần mềm và thiết kế một thiết bị đi
 
 Mục tiêu của dự án là tạo ra một hệ thống dễ sử dụng, có thể áp dụng trong các trường học, lớp học hoặc các sự kiện đông người. Thiết bị có tính ứng dụng cao, hỗ trợ quản lý thông tin điểm danh hiệu quả.
 
+## So sánh các phương thức điểm danh
+|Kiểu điểm danh|Truyền thống (điểm danh miệng)|Nhân diện khuôn mặt|Thẻ sinh viên|
+|--------------|------------------------------|-----------------------------|-------------|
+Độ chính xác | Thấp | Cao | Trung bình |
+Chi phí đầu tư | Không đáng kể | Cao | Thấp |
+Khả năng điểm danh lại trong 1 buổi | Có | Gần như không thể | Có |
+Khả năng điểm danh hộ | Có | Không thể | Khó hơn vì cần thẻ sinh viên |
+Dữ liệu cần có | Không cần | Cần thu thập dữ liệu khuôn mặt | Không cần đối với trường đã có thẻ sinh viên RFID |
+
+Như vậy, điểm danh sử dụng thẻ sinh viên là 1 phương thức tiết kiệm chi phí cùng với độ chính xác tương đối cao.
+
 ## Yêu cầu hệ thống
-Máy tính chạy hệ điều hành Windows (khuyến nghị Windows 10 trở lên)
+Máy tính chạy hệ điều hành Windows 64 bit (khuyến nghị Windows 10 trở lên)
 
 ## Cách cài đặt
 Phần mềm không yêu cầu cài đặt. Bạn chỉ cần tải phiên bản mới nhất tại phần [Release](https://github.com/TVTIT/ET2000_Project/releases/latest), giải nén file và chạy file `RFID_Arduino.exe`.
