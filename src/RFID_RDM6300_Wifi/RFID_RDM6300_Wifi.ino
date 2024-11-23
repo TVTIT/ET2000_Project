@@ -9,7 +9,7 @@
 #include <LCDI2C_Vietnamese.h>
 #include "rdm6300.h"
 
-#define RDM6300_TX_PIN D9  //Chân TX của RDM6300
+#define RDM6300_TX_PIN D9     //Chân TX của RDM6300
 #define WRITE_BUZZER_PIN D10  //Chân + của còi buzzer
 #define GREEN_LED_RGB D6      //Chân xanh lá của led rgb
 #define RED_LED_RGB D5        //Chân đỏ của led rgb
@@ -80,7 +80,13 @@ void connectWifi(bool isStartup) {
   WIFI_SSID = readFile(FILE_WIFI_SSID);
   const char* WIFI_PASSWORD = readFile(FILE_WIFI_PASSWORD);
 
-  WiFi.disconnect();
+  if (isWifiConnected) {
+    WiFi.disconnect();
+    while (WiFi.status() == WL_CONNECTED) {
+      delay(50);
+    }
+  }
+
   WiFi.hostname("ESP-DiemDanh");  //Fix 1 số wifi khó
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
@@ -102,6 +108,15 @@ void connectWifi(bool isStartup) {
   server.begin();  // Bắt đầu server
 
   isWifiConnected = true;
+}
+
+void printWifiStrength() {
+  lcd.setCursor(11, 1);
+  int rssi = WiFi.RSSI();
+  if (rssi > -50) lcd.print("[|||]");
+  else if (rssi > -65) lcd.print("[|| ]");
+  else if (rssi > -80) lcd.print("[|  ]");
+  else lcd.print("[   ]");
 }
 
 void setup() {
@@ -137,6 +152,24 @@ void loop() {
     delay(10000);
   }
 
+  if (WiFi.status() != WL_CONNECTED && isWifiConnected) {
+    isWifiConnected = false;
+    changeLedColor(255, 0, 0);
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.println("Mất kết nối Wifi");
+    lcd.print("Đang k.nối lại..");
+    int startAttemptTime = millis();
+    while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < 30000) {
+      delay(100);
+    }
+    if (WiFi.status() != WL_CONNECTED) {
+      writeFile(FILE_IS_USING_WIFI, "0");
+    } else {
+      isWifiConnected = true;
+    }
+  }
+
   //blue: đã kết nối wifi nhưng đang đợi
   //vàng = red + green: chưa kết nối COM
   //tím = red + blue: Đã kết nối COM
@@ -147,19 +180,14 @@ void loop() {
       printLCDTime = millis();
       if (showFirstInfo) {
         String str_wifiSSID = WIFI_SSID;
-        printAndScrollLCD("Đã kết nối Wifi:" + str_wifiSSID);
+        printAndScrollLCD("Wifi:" + str_wifiSSID);
       } else {
-        printAndScrollLCD("Địa chỉ IP: " + WiFi.localIP().toString());
+        printAndScrollLCD("IP:" + WiFi.localIP().toString());
       }
       showFirstInfo = !showFirstInfo;
+      printWifiStrength();
     }
-  } else if (isCOMConnected) {
-    printAndScrollLCD("Đã kết nối phần mềm");
-  } else {
-    printAndScrollLCD("Chưa kết nối phần mềm/Wifi");
-  }
 
-  if (isWifiConnected) {
     client = server.available();  // Chờ client kết nối
 
     if (client) {
@@ -181,7 +209,7 @@ void loop() {
             i++;
           }
           buffer[i] = '\0';
-          if (strncmp(buffer, "disconectWifi", 13) == 0) writeFile("/IsUsingWifi.txt", "0");
+          if (strncmp(buffer, "disconnectWifi", 14) == 0) writeFile("/IsUsingWifi.txt", "0");
           else if (strncmp(buffer, "noStudentAvail", 14) == 0) {
             printAndScrollLCD("Ko nhận dạng đc thẻ s.viên");
             printLCDTime = millis();
@@ -195,6 +223,10 @@ void loop() {
       }
       changeLedColor(!isWifiConnected * 170, !isWifiConnected * 255, isWifiConnected * 255);
     }
+  } else if (isCOMConnected) {
+    printAndScrollLCD("Đã kết nối phần mềm");
+  } else {
+    printAndScrollLCD("Chưa kết nối phần mềm/Wifi");
   }
 
   //kiểm tra xem module rfid có nhận được thẻ mới không
@@ -216,18 +248,31 @@ void loop() {
     String commandReceived = Serial.readString();
     if (commandReceived == "connectWifi") {
       while (Serial.available() <= 0) {
-        delay(10);
+        delay(100);
       }
-      writeFile(FILE_WIFI_SSID, Serial.readString().c_str());
+      delay(100);
+      int ssidLength = Serial.available();
+      char ssid[ssidLength + 1];
+      for (int i = 0; i < ssidLength; i++) {
+        ssid[i] = Serial.read();
+      }
+      ssid[ssidLength] = '\0';
+      writeFile(FILE_WIFI_SSID, ssid);
 
       while (Serial.available() <= 0) {
-        delay(10);
+        delay(100);
       }
-      String password = Serial.readString();
-      if (password == "null") {
-        password = "";
+      delay(100);
+      int passwordLength = Serial.available();
+      char password[passwordLength + 1];
+      for (int i = 0; i < passwordLength; i++) {
+        password[i] = Serial.read();
       }
-      writeFile(FILE_WIFI_PASSWORD, password.c_str());
+      password[passwordLength] = '\0';
+      if (strncmp(password, "null", 4) == 0) {
+        password[0] = '\0';
+      }
+      writeFile(FILE_WIFI_PASSWORD, password);
 
       writeFile(FILE_IS_USING_WIFI, "1");
 

@@ -474,29 +474,9 @@ void DiemDanhKhongKetNoi()
 void DiemDanhBangWifi()
 {
 	ClearScreen();
-	fmt::print("Nhập chính xác tên Wifi (chỉ hỗ trợ tên Wifi không dấu): ");
-	string Wifi_SSID = UnicodeInput();
-	fmt::print("Nhập chính xác mật khẩu Wifi: ");
-	string Wifi_Password = UnicodeInput();
-
-	if (Wifi_Password == "")
-		Wifi_Password = "null";
-
-	fmt::println("\nKiểm tra chính xác tên và mật khẩu Wifi, nếu đúng thì nhấn Enter để tiếp tục...");
-	cin.get();
-
-	fmt::println("Đang gửi tên và mật khẩu Wifi đến thiết bị...");
 	char wifiCommand[] = "connectWifi";
 	DWORD bytes_written;
-	if (WriteFile(hSerial, wifiCommand, sizeof(wifiCommand), &bytes_written, NULL))
-	{
-		Sleep(2000);
-		WriteFile(hSerial, Wifi_SSID.c_str(), Wifi_SSID.size(), &bytes_written, NULL);
-		Sleep(2000);
-		WriteFile(hSerial, Wifi_Password.c_str(), Wifi_Password.size(), &bytes_written, NULL);
-		Sleep(1000);
-	}
-	else
+	if (!WriteFile(hSerial, wifiCommand, sizeof(wifiCommand), &bytes_written, NULL))
 	{
 		fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Lỗi khi gửi dữ liệu qua cổng COM. Hãy kiểm tra lại kết nối với thiết bị\n");
 
@@ -505,6 +485,14 @@ void DiemDanhBangWifi()
 
 		exit(1);
 	}
+	fmt::print("Nhập chính xác tên Wifi (chỉ hỗ trợ tên Wifi không dấu): ");
+	string Wifi_SSID = UnicodeInput();
+	WriteFile(hSerial, Wifi_SSID.c_str(), Wifi_SSID.size(), &bytes_written, NULL);
+	fmt::print("Nhập chính xác mật khẩu Wifi: ");
+	string Wifi_Password = UnicodeInput();
+	if (Wifi_Password == "")
+		Wifi_Password = "null";
+	WriteFile(hSerial, Wifi_Password.c_str(), Wifi_Password.size(), &bytes_written, NULL);
 
 	fmt::println("Đang kết nối Wifi...");
 	char szBuff[100];
@@ -589,7 +577,6 @@ void MainInterface()
 	{
 		ClearScreen();
 		fmt::print("Nhập địa chỉ IP của thiết bị: ");
-		fmt::println("Đang kết nối...");
 		WifiConnection::Connect(UnicodeInput());
 		PauseAndBack();
 	}

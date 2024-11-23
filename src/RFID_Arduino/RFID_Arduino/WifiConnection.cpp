@@ -27,6 +27,7 @@ SOCKET sock;
 /// </summary>
 /// <param name="IP">IP của ESP8266</param>
 void WifiConnection::Connect(string IP) {
+    fmt::println("Đang kết nối...");
     //Khởi tạo Winsock
     WSAData data;
     WORD ver = MAKEWORD(2, 2);
@@ -165,7 +166,7 @@ void WifiConnection::HookEnter()
 
     if (!lastConnectionError)
     {
-        int sendResult = send(sock, "disconectWifi", 14, 0);
+        int sendResult = send(sock, "disconnectWifi", 14, 0);
         Sleep(100);
     }
     
