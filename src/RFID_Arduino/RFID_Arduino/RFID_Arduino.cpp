@@ -503,11 +503,25 @@ void DiemDanhBangWifi()
 	WriteToSerial("connectWifi");
 	fmt::print("Nhập chính xác tên Wifi (chỉ hỗ trợ tên Wifi không dấu): ");
 	string Wifi_SSID = UnicodeInput();
+	if (Wifi_SSID == "")
+	{
+		fmt::println("");
+		fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Tên Wifi không được bỏ trống");
+		fmt::println("");
+		PauseAndBack();
+	}
 	WriteToSerial(Wifi_SSID.c_str());
-	fmt::print("Nhập chính xác mật khẩu Wifi: ");
+	fmt::print("Nhập chính xác mật khẩu Wifi (nếu không có thì bỏ trống): ");
 	string Wifi_Password = UnicodeInput();
 	if (Wifi_Password == "")
 		Wifi_Password = "null";
+	else if (Wifi_Password.size() < 8)
+	{
+		fmt::println("");
+		fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Mật khẩu phải có ít nhất 8 ký tự");
+		fmt::println("");
+		PauseAndBack();
+	}
 	Sleep(100);
 	WriteToSerial(Wifi_Password.c_str());
 
