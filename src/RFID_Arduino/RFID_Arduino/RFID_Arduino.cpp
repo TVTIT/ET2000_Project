@@ -107,9 +107,15 @@ void HookEnter()
 	isContinue = false;
 }
 
-void SentStartupCommand()
+void WriteToSerial(const char* command)
 {
-	WriteFile(hSerial, "startup", 8, NULL, NULL);
+	DWORD bytes_written;
+	if (!WriteFile(hSerial, command, strlen(command) + 1, &bytes_written, NULL))
+	{
+		fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Lỗi khi gửi dữ liệu qua cổng COM. Hãy kiểm tra lại kết nối với thiết bị");
+		fmt::println("");
+		PauseAndExit();
+	}
 }
 
 /// <summary>
@@ -198,7 +204,7 @@ void InitializeRFID()
 
 	if (!lastCOMConnection)
 	{
-		SentStartupCommand();
+		WriteToSerial("startup");
 		lastCOMConnection = true;
 	}
 }
@@ -352,71 +358,59 @@ void ReadTXTFileInSDCard()
 
 	char printCommand[] = "printTXTFile";
 	DWORD bytes_written;
-	if (WriteFile(hSerial, printCommand, sizeof(printCommand), &bytes_written, NULL))
+	char szBuff[2000] = { 0 };
+	DWORD dwBytesRead = 0;
+	string IDsCardFromTXT;
+
+	WriteToSerial("printTXTFile");
+	if (ReadFile(hSerial, szBuff, sizeof(szBuff) - 1, &dwBytesRead, NULL))
 	{
-		char szBuff[2000];
-		DWORD dwBytesRead = 0;
-		string IDsCardFromTXT;
-
-		if (ReadFile(hSerial, szBuff, sizeof(szBuff) - 1, &dwBytesRead, NULL))
+		if (dwBytesRead > 0)
 		{
-			if (dwBytesRead > 0) 
+			szBuff[dwBytesRead] = '\0';  // Kết thúc chuỗi
+			IDsCardFromTXT = szBuff;
+
+			if (IDsCardFromTXT == "sdcard_empty")
 			{
-				szBuff[dwBytesRead] = '\0';  // Kết thúc chuỗi
-				IDsCardFromTXT = szBuff;
-				
-				if (IDsCardFromTXT == "sdcard_empty")
-				{
-					fmt::print(fmt::fg(fmt::color::black) | fmt::bg(fmt::color::yellow), "Không có dữ liệu trong thẻ nhớ\n");
-				}
-				else
-				{
-					vector<string> IDsCardFromTXT_splited = SplitString(IDsCardFromTXT, '\n');
-
-					for (int i = 0; i < IDsCardFromTXT_splited.size(); i++)
-					{
-						bool isIDCardExists = false;
-						string student_name;
-
-						ReadWriteCSV::GetStudentName(IDsCardFromTXT_splited[i], student_name, isIDCardExists);
-						if (isIDCardExists)
-						{
-							fmt::println(student_name + " đã điểm danh");
-						}
-						else
-						{
-							fmt::println("ID thẻ {0} không nhận dạng được", IDsCardFromTXT_splited[i]);
-						}
-					}
-
-					fmt::println("");
-					fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "Đọc dữ liệu hoàn tất! Nhấn phím Enter để tổng hợp kết quả...");
-					fmt::println("");
-					cin.get();
-
-					ReadWriteCSV::InKetQuaDiemDanh();
-					ReadWriteCSV::LuuDuLieuDiemDanh();
-				}
+				fmt::print(fmt::fg(fmt::color::black) | fmt::bg(fmt::color::yellow), "Không có dữ liệu trong thẻ nhớ\n");
 			}
 			else
 			{
-				fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Lỗi khi đọc dữ liệu từ cổng COM. Hãy kiểm tra lại kết nối với thiết bị");
+				vector<string> IDsCardFromTXT_splited = SplitString(IDsCardFromTXT, '\n');
+
+				for (int i = 0; i < IDsCardFromTXT_splited.size(); i++)
+				{
+					bool isIDCardExists = false;
+					string student_name;
+
+					ReadWriteCSV::GetStudentName(IDsCardFromTXT_splited[i], student_name, isIDCardExists);
+					if (isIDCardExists)
+					{
+						fmt::println(student_name + " đã điểm danh");
+					}
+					else
+					{
+						fmt::println("ID thẻ {0} không nhận dạng được", IDsCardFromTXT_splited[i]);
+					}
+				}
+
 				fmt::println("");
-				fmt::println("\nNhấn phím Enter để thử lại...");
+				fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "Đọc dữ liệu hoàn tất! Nhấn phím Enter để tổng hợp kết quả...");
+				fmt::println("");
 				cin.get();
-				ReadTXTFileInSDCard();
+
+				ReadWriteCSV::InKetQuaDiemDanh();
+				ReadWriteCSV::LuuDuLieuDiemDanh();
 			}
 		}
-
-		
-	}
-	else
-	{
-		fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Lỗi khi gửi dữ liệu qua cổng COM. Hãy kiểm tra lại kết nối với thiết bị\n");
-
-		fmt::println("\nNhấn phím Enter để thử lại...");
-		cin.get();
-		ReadTXTFileInSDCard();
+		else
+		{
+			fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Lỗi khi đọc dữ liệu từ cổng COM. Hãy kiểm tra lại kết nối với thiết bị");
+			fmt::println("");
+			fmt::println("\nNhấn phím Enter để thử lại...");
+			cin.get();
+			ReadTXTFileInSDCard();
+		}
 	}
 }
 
@@ -438,69 +432,39 @@ void DiemDanhKhongKetNoi()
 
 	fmt::println("Nhấn phím Enter để tiếp tục...");
 	cin.get();
+	WriteToSerial("prepareForDisconnect");
 
-	char prepareCommand[] = "prepareForDisconnect";
-	DWORD bytes_written;
+	fmt::println("Sau khi rút thiết bị ra, hãy cắm nguồn 9V vào thiết bị");
+	fmt::println("Sau đó thực hiện việc quét thẻ điểm danh như bình thường\n");
 
-	if (WriteFile(hSerial, prepareCommand, sizeof(prepareCommand), &bytes_written, NULL))
+	fmt::println("Hãy rút thiết bị ra...\n");
+
+	char szBuff[32] = { 0 };
+	DWORD dwBytesRead = 0;
+	while (ReadFile(hSerial, szBuff, sizeof(szBuff) - 1, &dwBytesRead, NULL))
 	{
-		fmt::println("Sau khi rút thiết bị ra, hãy cắm nguồn 9V vào thiết bị");
-		fmt::println("Sau đó thực hiện việc quét thẻ điểm danh như bình thường\n");
 
-		fmt::println("Hãy rút thiết bị ra...\n");
-
-		char szBuff[32] = { 0 };
-		DWORD dwBytesRead = 0;
-		while (ReadFile(hSerial, szBuff, sizeof(szBuff) - 1, &dwBytesRead, NULL))
-		{
-
-		}
-		//CloseHandle(hSerial);
-
-		fmt::println("Khi thực hiện điểm danh xong, kết nối lại thiết bị");
-		fmt::println("rồi nhấn Enter (hoặc chọn lựa chọn 5 ở màn hình chính)\n");
-
-		fmt::println("Nhấn phím Enter để tiếp tục...");
-		cin.get();
-
-		InitializeRFID();
-		ReadTXTFileInSDCard();
 	}
-	else
-	{
-		fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Lỗi khi gửi dữ liệu qua cổng COM. Hãy kiểm tra lại kết nối với thiết bị\n");
+	//CloseHandle(hSerial);
 
-		fmt::println("\nNhấn phím Enter để thoát...");
-		cin.get();
+	fmt::println("Khi thực hiện điểm danh xong, kết nối lại thiết bị");
+	fmt::println("rồi nhấn Enter (hoặc chọn lựa chọn 5 ở màn hình chính)\n");
 
-		exit(1);
-	}
+	fmt::println("Nhấn phím Enter để tiếp tục...");
+	cin.get();
+
+	InitializeRFID();
+	ReadTXTFileInSDCard();
 }
 
-void DiemDanhBangWifi()
+/// <summary>
+/// Kiểm tra xem thiết bị kết nối Wifi thành công hay không và lấy IP
+/// </summary>
+void ReadDeviceIP()
 {
-	ClearScreen();
-	char wifiCommand[] = "connectWifi";
-	DWORD bytes_written;
-	if (!WriteFile(hSerial, wifiCommand, sizeof(wifiCommand), &bytes_written, NULL))
-	{
-		fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Lỗi khi gửi dữ liệu qua cổng COM. Hãy kiểm tra lại kết nối với thiết bị\n");
-
-		PauseAndExit();
-	}
-	fmt::print("Nhập chính xác tên Wifi (chỉ hỗ trợ tên Wifi không dấu): ");
-	string Wifi_SSID = UnicodeInput();
-	WriteFile(hSerial, Wifi_SSID.c_str(), Wifi_SSID.size(), &bytes_written, NULL);
-	fmt::print("Nhập chính xác mật khẩu Wifi: ");
-	string Wifi_Password = UnicodeInput();
-	if (Wifi_Password == "")
-		Wifi_Password = "null";
-	WriteFile(hSerial, Wifi_Password.c_str(), Wifi_Password.size(), &bytes_written, NULL);
-
-	fmt::println("Đang kết nối Wifi...");
-	char szBuff[100];
-	DWORD dwBytesRead = 0;
 	string IP = "";
+	char szBuff[32] = { 0 };
+	DWORD dwBytesRead = 0;
 	while (ReadFile(hSerial, szBuff, sizeof(szBuff) - 1, &dwBytesRead, NULL))
 	{
 		if (dwBytesRead > 0)
@@ -514,7 +478,7 @@ void DiemDanhBangWifi()
 				PauseAndBack();
 				return;
 			}
-			
+
 			fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "kết nối Wifi thành công!");
 			fmt::println("");
 			fmt::println("Địa chỉ IP của thiết bị: " + IP);
@@ -522,29 +486,46 @@ void DiemDanhBangWifi()
 		}
 	}
 
-	//CloseHandle(hSerial);
-
 	fmt::println("Kết nối thiết bị với nguồn 9V, sau khi đèn chuyển sang màu xanh dương");
 	fmt::println("thì nhấn Enter để tiếp tục...");
 	cin.get();
 
 	ClearScreen();
 	WifiConnection::Connect(IP);
+}
+
+/// <summary>
+/// Gửi lệnh kết nối Wifi được chỉ định đến thiết bị
+/// </summary>
+void DiemDanhBangWifi()
+{
+	ClearScreen();
+	WriteToSerial("connectWifi");
+	fmt::print("Nhập chính xác tên Wifi (chỉ hỗ trợ tên Wifi không dấu): ");
+	string Wifi_SSID = UnicodeInput();
+	WriteToSerial(Wifi_SSID.c_str());
+	fmt::print("Nhập chính xác mật khẩu Wifi: ");
+	string Wifi_Password = UnicodeInput();
+	if (Wifi_Password == "")
+		Wifi_Password = "null";
+	Sleep(100);
+	WriteToSerial(Wifi_Password.c_str());
+
+	fmt::println("Đang kết nối Wifi...");
+	ReadDeviceIP();
+
 	PauseAndBack();
 }
 
+/// <summary>
+/// Kết nối lại Wifi trước đó đã được lưu trong thiết bị
+/// </summary>
 void DeviceReconnectWifi()
 {
 	ClearScreen();
 	fmt::println("Đang đọc tên và mật khẩu Wifi được lưu trong thiết bị...");
-	DWORD bytes_written;
-	if (!WriteFile(hSerial, "printWifiCredential", 20, &bytes_written, NULL))
-	{
-		fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Lỗi khi gửi dữ liệu qua cổng COM. Hãy kiểm tra lại kết nối với thiết bị\n");
-
-		PauseAndExit();
-	}
-	char szBuff[100];
+	WriteToSerial("printWifiCredential");
+	char szBuff[100] = { 0 };
 	DWORD dwBytesRead = 0;
 	string serialRecv = "";
 	if (ReadFile(hSerial, szBuff, sizeof(szBuff) - 1, &dwBytesRead, NULL))
@@ -572,37 +553,10 @@ void DeviceReconnectWifi()
 	fmt::println("\nNếu chưa đúng thông tin, hãy khởi động lại phần mềm và chọn lựa chọn 6");
 	fmt::println("Nhấn phím Enter để kết nối Wifi...");
 	cin.get();
+	WriteToSerial("reconnectWifi");
 	fmt::println("Đang kết nối Wifi...");
-	WriteFile(hSerial, "reconnectWifi", 14, &bytes_written, NULL);
+	ReadDeviceIP();
 
-	string IP = "";
-	while (ReadFile(hSerial, szBuff, sizeof(szBuff) - 1, &dwBytesRead, NULL))
-	{
-		if (dwBytesRead > 0)
-		{
-			szBuff[dwBytesRead] = '\0';
-			IP = szBuff;
-			if (IP == "wifiError")
-			{
-				fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Kết nối Wifi không thành công. Hãy kiếm tra lại tên và mật khẩu Wifi");
-				fmt::println("");
-				PauseAndBack();
-				return;
-			}
-
-			fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "kết nối Wifi thành công!");
-			fmt::println("");
-			fmt::println("Địa chỉ IP của thiết bị: " + IP);
-			fmt::println("\nHãy rút thiết bị ra...\n");
-		}
-	}
-
-	fmt::println("Kết nối thiết bị với nguồn 9V, sau khi đèn chuyển sang màu xanh dương");
-	fmt::println("thì nhấn Enter để tiếp tục...");
-	cin.get();
-
-	ClearScreen();
-	WifiConnection::Connect(IP);
 	PauseAndBack();
 }
 
