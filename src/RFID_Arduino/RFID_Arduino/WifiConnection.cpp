@@ -90,14 +90,7 @@ void WifiConnection::Connect(string IP) {
             {
                 string str_input = string(buf, 0, bytesRecevied);
 
-                stringstream stream_input(str_input);
-                string segment;
-                vector<string> input_splited;
-
-                while (getline(stream_input, segment, '\n'))
-                {
-                    input_splited.push_back(segment);
-                }
+                vector<string> input_splited = SplitString(str_input, '\n');
 
                 string ID_Card = "";
                 for (int i = 0; i < input_splited.size(); i++)
@@ -119,14 +112,8 @@ void WifiConnection::Connect(string IP) {
                 {
                     fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "{0} đã điểm danh vào lúc {1}", student_name, GetTimeNow(0));
                     fmt::println("");
-                    stringstream stream_student_name(student_name);
-                    string segment;
-                    vector<string> student_name_splited;
-
-                    while (getline(stream_student_name, segment, ' '))
-                    {
-                        student_name_splited.push_back(segment);
-                    }
+                    vector<string> student_name_splited = SplitString(student_name, ' ');
+                    
                     //Gửi MSSV đến thiết bị
                     send(sock, student_name_splited[student_name_splited.size() - 1].c_str(), student_name_splited[student_name_splited.size() - 1].size(), 0);
                 }

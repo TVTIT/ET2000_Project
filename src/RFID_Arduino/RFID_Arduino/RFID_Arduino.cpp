@@ -223,6 +223,19 @@ string GetTimeNow(int type)
 	return oss.str();
 }
 
+vector<string> SplitString(string input, char pattern)
+{
+	stringstream sstream(input);
+	string segment;
+	vector<string> input_splited;
+
+	while (getline(sstream, segment, pattern))
+	{
+		input_splited.push_back(segment);
+	}
+	return input_splited;
+}
+
 void AddStudent()
 {
 	ClearScreen();
@@ -358,14 +371,7 @@ void ReadTXTFileInSDCard()
 				}
 				else
 				{
-					stringstream stream_IDsCardFromTXT(IDsCardFromTXT);
-					string segment;
-					vector<string> IDsCardFromTXT_splited;
-
-					while (getline(stream_IDsCardFromTXT, segment, '\n'))
-					{
-						IDsCardFromTXT_splited.push_back(segment);
-					}
+					vector<string> IDsCardFromTXT_splited = SplitString(IDsCardFromTXT, '\n');
 
 					for (int i = 0; i < IDsCardFromTXT_splited.size(); i++)
 					{
@@ -480,10 +486,7 @@ void DiemDanhBangWifi()
 	{
 		fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Lỗi khi gửi dữ liệu qua cổng COM. Hãy kiểm tra lại kết nối với thiết bị\n");
 
-		fmt::println("\nNhấn phím Enter để thoát...");
-		cin.get();
-
-		exit(1);
+		PauseAndExit();
 	}
 	fmt::print("Nhập chính xác tên Wifi (chỉ hỗ trợ tên Wifi không dấu): ");
 	string Wifi_SSID = UnicodeInput();
@@ -530,6 +533,79 @@ void DiemDanhBangWifi()
 	PauseAndBack();
 }
 
+void DeviceReconnectWifi()
+{
+	ClearScreen();
+	fmt::println("Đang đọc tên và mật khẩu Wifi được lưu trong thiết bị...");
+	DWORD bytes_written;
+	if (!WriteFile(hSerial, "printWifiCredential", 20, &bytes_written, NULL))
+	{
+		fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Lỗi khi gửi dữ liệu qua cổng COM. Hãy kiểm tra lại kết nối với thiết bị\n");
+
+		PauseAndExit();
+	}
+	char szBuff[100];
+	DWORD dwBytesRead = 0;
+	string serialRecv = "";
+	if (ReadFile(hSerial, szBuff, sizeof(szBuff) - 1, &dwBytesRead, NULL))
+	{
+		if (dwBytesRead > 0)
+		{
+			szBuff[dwBytesRead] = '\0';
+			serialRecv = szBuff;
+			vector<string> serialRecv_splited = SplitString(serialRecv, '\n');
+
+			fmt::println("Tên Wifi: {0}", serialRecv_splited[0]);
+			if (serialRecv_splited[1] == "null")
+				fmt::println("Wifi không có mật khẩu");
+			else
+				fmt::println("Mật khẩu: {0}", serialRecv_splited[1]);
+			//break;
+		}
+	}
+	else
+	{
+		fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Lỗi khi đọc dữ liệu từ cổng COM. Hãy kiểm tra lại kết nối với thiết bị");
+		fmt::println("");
+		PauseAndExit();
+	}
+	fmt::println("\nNếu chưa đúng thông tin, hãy khởi động lại phần mềm và chọn lựa chọn 6");
+	fmt::println("Nhấn phím Enter để kết nối Wifi...");
+	cin.get();
+	fmt::println("Đang kết nối Wifi...");
+	WriteFile(hSerial, "reconnectWifi", 14, &bytes_written, NULL);
+
+	string IP = "";
+	while (ReadFile(hSerial, szBuff, sizeof(szBuff) - 1, &dwBytesRead, NULL))
+	{
+		if (dwBytesRead > 0)
+		{
+			szBuff[dwBytesRead] = '\0';
+			IP = szBuff;
+			if (IP == "wifiError")
+			{
+				fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::red), "Kết nối Wifi không thành công. Hãy kiếm tra lại tên và mật khẩu Wifi");
+				fmt::println("");
+				PauseAndBack();
+				return;
+			}
+
+			fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "kết nối Wifi thành công!");
+			fmt::println("");
+			fmt::println("Địa chỉ IP của thiết bị: " + IP);
+			fmt::println("\nHãy rút thiết bị ra...\n");
+		}
+	}
+
+	fmt::println("Kết nối thiết bị với nguồn 9V, sau khi đèn chuyển sang màu xanh dương");
+	fmt::println("thì nhấn Enter để tiếp tục...");
+	cin.get();
+
+	ClearScreen();
+	WifiConnection::Connect(IP);
+	PauseAndBack();
+}
+
 void MainInterface()
 {
 	InitializeRFID();
@@ -542,7 +618,8 @@ void MainInterface()
 	fmt::println("[5] Đọc dữ liệu trong bộ nhớ và điểm danh");
 	fmt::println("[6] Điểm danh sử dụng cùng 1 mạng Wifi");
 	fmt::println("[7] Kết nối lại với thiết bị qua Wifi");
-	fmt::println("[8] Thoát");
+	fmt::println("[8] Yêu cầu thiết bị kết nối lại Wifi trước đó");
+	fmt::println("[9] Thoát");
 	fmt::print("Nhập lựa chọn của bạn: ");
 
 	getline(cin, user_input);
@@ -581,6 +658,10 @@ void MainInterface()
 		PauseAndBack();
 	}
 	else if (user_input == "8")
+	{
+		DeviceReconnectWifi();
+	}
+	else if (user_input == "9")
 	{
 
 	}

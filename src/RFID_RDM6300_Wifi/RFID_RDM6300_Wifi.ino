@@ -88,6 +88,7 @@ void connectWifi(bool isStartup) {
   }
 
   WiFi.hostname("ESP-DiemDanh");  //Fix 1 số wifi khó
+  WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
   printAndScrollLCD("Đang kết nối Wifi...");
@@ -276,6 +277,22 @@ void loop() {
 
       writeFile(FILE_IS_USING_WIFI, "1");
 
+      connectWifi(false);
+    } else if (commandReceived == "printWifiCredential") {
+      char* ssid = readFile(FILE_WIFI_SSID);
+      char* password_read = readFile(FILE_WIFI_PASSWORD);
+      char password[strlen(password_read) > 3 ? strlen(password_read) + 1: 5];
+      if (password_read[0] == '\0') 
+        strcpy(password, "null");
+      else
+        strcpy(password, password_read);
+      
+      char printCommand[strlen(ssid) + strlen(password) + 2];
+      strcpy(printCommand, ssid);
+      strcat(printCommand, "\n");
+      strcat(printCommand, password);
+      Serial.print(printCommand);
+    } else if (commandReceived == "reconnectWifi") {
       connectWifi(false);
     } else if (commandReceived == "printTXTFile") {
       File fileDiemDanh = LittleFS.open(FILE_DIEM_DANH, "r");

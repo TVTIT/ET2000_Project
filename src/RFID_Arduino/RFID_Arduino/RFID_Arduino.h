@@ -7,3 +7,4 @@ void ClearScreen();
 void PauseAndExit();
 void PauseAndBack();
 string UnicodeInput();
+vector<string> SplitString(string input, char pattern);
