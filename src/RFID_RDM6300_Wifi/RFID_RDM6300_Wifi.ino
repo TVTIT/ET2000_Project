@@ -66,6 +66,30 @@ char* readFile(const char* filePath) {
   return text;
 }
 
+void readTextSerial(char* result, int maxLength) {
+  int i = 0;
+  while (Serial.available() && i < maxLength - 1) {
+    result[i] = Serial.read();
+    i++;
+    delay(2);
+  }
+  result[i] = '\0';
+}
+
+
+void waitAndReadSerial(char* result, int maxLength) {
+  while (!Serial.available()) {
+    delay(10);
+  }
+  int i = 0;
+  while (Serial.available() && i < maxLength - 1) {
+    result[i] = Serial.read();
+    i++;
+    delay(2);
+  }
+  result[i] = '\0';
+}
+
 void printAndScrollLCD(String text) {
   if (previousTextLCD == text) return;
   previousTextLCD = text;
@@ -176,12 +200,10 @@ void loop() {
   //tím = red + blue: Đã kết nối COM
   changeLedColor(!isWifiConnected * 170, !(isWifiConnected || isCOMConnected) * 255, (isWifiConnected || isCOMConnected) * 255);
   if (isWifiConnected) {
-    String wifiSSID = WIFI_SSID;
     if (millis() - printLCDTime >= 2000) {
       printLCDTime = millis();
       if (showFirstInfo) {
-        String str_wifiSSID = WIFI_SSID;
-        printAndScrollLCD("Wifi:" + str_wifiSSID);
+        printAndScrollLCD("Wifi:" + String(WIFI_SSID));
       } else {
         printAndScrollLCD("IP:" + WiFi.localIP().toString());
       }
@@ -246,30 +268,15 @@ void loop() {
     digitalWrite(WRITE_BUZZER_PIN, LOW);
   } else if (Serial.available() > 0) {  //nếu nhận được lệnh từ serial
     isCOMConnected = true;              //chuyển trạng thái kết nối cổng COM
-    String commandReceived = Serial.readString();
-    if (commandReceived == "connectWifi") {
-      while (Serial.available() <= 0) {
-        delay(100);
-      }
-      delay(100);
-      int ssidLength = Serial.available();
-      char ssid[ssidLength + 1];
-      for (int i = 0; i < ssidLength; i++) {
-        ssid[i] = Serial.read();
-      }
-      ssid[ssidLength] = '\0';
+    char commandReceived[32];
+    readTextSerial(commandReceived, 32);
+    if (strncmp(commandReceived, "connectWifi", 11) == 0) {
+      char ssid[33];
+      waitAndReadSerial(ssid, 33);
       writeFile(FILE_WIFI_SSID, ssid);
-
-      while (Serial.available() <= 0) {
-        delay(100);
-      }
-      delay(100);
-      int passwordLength = Serial.available();
-      char password[passwordLength + 1];
-      for (int i = 0; i < passwordLength; i++) {
-        password[i] = Serial.read();
-      }
-      password[passwordLength] = '\0';
+      
+      char password[65];
+      waitAndReadSerial(password, 65);
       if (strncmp(password, "null", 4) == 0) {
         password[0] = '\0';
       }
@@ -278,23 +285,23 @@ void loop() {
       writeFile(FILE_IS_USING_WIFI, "1");
 
       connectWifi(false);
-    } else if (commandReceived == "printWifiCredential") {
+    } else if (strncmp(commandReceived, "printWifiCredential", 19) == 0) {
       char* ssid = readFile(FILE_WIFI_SSID);
       char* password_read = readFile(FILE_WIFI_PASSWORD);
-      char password[strlen(password_read) > 3 ? strlen(password_read) + 1: 5];
-      if (password_read[0] == '\0') 
+      char password[strlen(password_read) > 3 ? strlen(password_read) + 1 : 5];
+      if (password_read[0] == '\0')
         strcpy(password, "null");
       else
         strcpy(password, password_read);
-      
+
       char printCommand[strlen(ssid) + strlen(password) + 2];
       strcpy(printCommand, ssid);
       strcat(printCommand, "\n");
       strcat(printCommand, password);
       Serial.print(printCommand);
-    } else if (commandReceived == "reconnectWifi") {
+    } else if (strncmp(commandReceived, "reconnectWifi", 13) == 0) {
       connectWifi(false);
-    } else if (commandReceived == "printTXTFile") {
+    } else if (strncmp(commandReceived, "printTXTFile", 12) == 0) {
       File fileDiemDanh = LittleFS.open(FILE_DIEM_DANH, "r");
       if (fileDiemDanh.size() == 0) {
         Serial.print("sdcard_empty");
@@ -304,7 +311,7 @@ void loop() {
         }
       }
       fileDiemDanh.close();
-    } else if (commandReceived == "prepareForDisconnect") {
+    } else if (strncmp(commandReceived, "prepareForDisconnect", 20) == 0) {
       writeFile(FILE_DIEM_DANH, "");
     }
   }
