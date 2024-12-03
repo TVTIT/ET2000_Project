@@ -1,0 +1,9 @@
+﻿  ReadWriteCSV.cpp
+D:\Hoc\ET2000 Project\src\RFID_Arduino\RFID_ESP8266\ReadWriteCSV.cpp(72,43): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+  RFID_Arduino.cpp
+D:\Hoc\ET2000 Project\src\RFID_Arduino\RFID_ESP8266\RFID_Arduino.cpp(113,51): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+D:\Hoc\ET2000 Project\src\RFID_Arduino\RFID_ESP8266\RFID_Arduino.cpp(360,8): warning C4101: 'bytes_written': unreferenced local variable
+  WifiConnection.cpp
+D:\Hoc\ET2000 Project\src\RFID_Arduino\RFID_ESP8266\WifiConnection.cpp(118,153): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  Generating Code...
+  RFID_ESP8266.vcxproj -> D:\Hoc\ET2000 Project\src\RFID_Arduino\x64\Debug\RFID_ESP8266.exe

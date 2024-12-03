@@ -141,7 +141,6 @@
   <ItemGroup>
     <ClCompile Include="ReadWriteCSV.cpp" />
     <ClCompile Include="RFID_Arduino.cpp" />
-    <ClCompile Include="WifiConnection.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="fmt\args.h" />
@@ -161,7 +160,6 @@
     <ClInclude Include="rapidcsv.h" />
     <ClInclude Include="ReadWriteCSV.h" />
     <ClInclude Include="RFID_Arduino.h" />
-    <ClInclude Include="WifiConnection.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
