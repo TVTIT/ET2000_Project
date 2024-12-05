@@ -6,9 +6,6 @@
 name: MSBuild
 
 on:
-  push:
-    branches:
-      - "TVTIT-patch-1"
   workflow_dispatch:
 
 env:
@@ -43,4 +40,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
        name: build-output
-       path: ./build-output.zip
+       path: ./src/RFID_Arduino/x64/${{env.BUILD_CONFIGURATION}}/
