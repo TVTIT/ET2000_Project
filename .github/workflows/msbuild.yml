@@ -5,7 +5,13 @@
 
 name: MSBuild
 
-on: workflow_dispatch
+on: 
+  workflow_dispatch:
+    inputs:
+      test:
+        description: "test"
+        required: false
+        type: string
 
 env:
   # Path to the solution file relative to the root of the project.
