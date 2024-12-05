@@ -11,6 +11,7 @@
 - **Arduino UNO R3**: Bộ vi điều khiển chính của thiết bị.
 - **Module RFID 125kHz RDM6300**: Dùng để đọc ID từ thẻ sinh viên.
 - **Module Micro SD Card SPI**: Lưu trữ ID thẻ khi thiết bị chưa kết nối phần mềm.
+- **Màn hình LCD 1602**: Hiển thị trạng thái thiết bị, thông tin thẻ sinh viên quét được.
 - **Còi chip 5V**: Phát tín hiệu khi quét thẻ thành công.
 - **Đèn LED RGB**: Hiển thị trạng thái hoạt động của thiết bị.
 - **Pin 9V**: Cung cấp nguồn cho thiết bị.

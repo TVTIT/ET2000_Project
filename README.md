@@ -22,11 +22,11 @@ Như vậy, điểm danh sử dụng thẻ sinh viên là 1 phương thức ti�
 Máy tính chạy hệ điều hành Windows 64 bit (khuyến nghị Windows 10 trở lên)
 
 ## Cách cài đặt
-Phần mềm không yêu cầu cài đặt. Bạn chỉ cần tải phiên bản mới nhất tại phần [Release](https://github.com/TVTIT/ET2000_Project/releases/latest), giải nén file và chạy file `RFID_Arduino.exe`.
+Phần mềm không yêu cầu cài đặt. Bạn chỉ cần tải phiên bản mới nhất tại phần [Release](https://github.com/TVTIT/ET2000_Project/releases/latest), giải nén file và chạy file `RFID_Arduino.exe` đối với Arduino hoặc `RFID_ESP8266.exe` đối với Wemos D1 Wifi.
 
 ## Hướng dẫn sử dụng phần mềm  
 1. **Kết nối thiết bị**: Kết nối thiết bị với máy tính qua cổng USB.  
-2. **Chạy phần mềm**: Mở `RFID_Arduino.exe`.  
+2. **Chạy phần mềm**: Mở `RFID_Arduino.exe` hoặc `RFID_ESP8266.exe`.  
 3. **Xác định cổng COM của Arduino**:  
    - Chuột phải vào `This PC` → `Manage` → `Device Manager`.  
    - Tìm `Ports (COM & LPT)` và nhập đúng cổng COM hiển thị tên `Arduino Uno` hoặc `USB-SERIAL CH340` vào phần mềm.  
