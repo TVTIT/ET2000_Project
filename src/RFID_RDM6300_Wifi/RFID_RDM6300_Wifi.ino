@@ -53,10 +53,14 @@ void writeFile(const char* filePath, const char* text) {
 char* readFile(const char* filePath) {
   File file = LittleFS.open(filePath, "r");
   if (!file) {
-    changeLedColor(255, 0, 0);
-    Serial.println("error");
-    isFlashError = true;
-    return NULL;
+    if (!LittleFS.exists(filePath)) {
+      writeFile(filePath, "");
+    } else {
+      changeLedColor(255, 0, 0);
+      Serial.println("error");
+      isFlashError = true;
+    }
+    return (char*)"";
   }
   int fileSize = file.size();
   char* text = new char[fileSize + 1];
@@ -274,7 +278,7 @@ void loop() {
       char ssid[33];
       waitAndReadSerial(ssid, 33);
       writeFile(FILE_WIFI_SSID, ssid);
-      
+
       char password[65];
       waitAndReadSerial(password, 65);
       if (strncmp(password, "null", 4) == 0) {
