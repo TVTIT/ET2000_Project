@@ -8,7 +8,7 @@ name: MSBuild
 on:
   push:
     branches:
-      - "TVTIT-path-1"
+      - "TVTIT-patch-1"
   workflow_dispatch:
 
 env:
