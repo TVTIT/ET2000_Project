@@ -38,5 +38,6 @@ jobs:
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v3
       with:
-       name: build-output
-       path: ./src/RFID_Arduino/x64/${{env.BUILD_CONFIGURATION}}/
+        name: build-output
+        path: ./src/RFID_Arduino/x64/${{env.BUILD_CONFIGURATION}}/
+
