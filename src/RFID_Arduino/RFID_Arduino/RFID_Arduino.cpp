@@ -8,9 +8,6 @@
 #include <fstream>
 #include <sstream>
 #include <fcntl.h>
-//#include <winsock2.h>
-//#include <ws2tcpip.h>
-//#pragma comment(lib, "ws2_32.lib")
 #include <windows.h>
 
 #include "ReadWriteCSV.h"
@@ -403,34 +400,48 @@ void ReadTXTFileInSDCard()
 /// Điểm danh không cần kết nối với máy tính
 /// Cách thức hoạt động:
 /// 1. Xoá dữ liệu điểm danh ở thẻ nhớ trước đó
-/// 2. Cắm pin 9V vào arduino rồi quét thẻ như bình thường
-/// 3. Sau khi hoàn tất, rút pin 9V rồi cắm arduino vào máy tính
-/// 4. Gọi hàm ReadTXTFileInSDCard() để đọc dữ liệu từ file text qua Serial
+/// 2. Gửi file CSV vào thẻ nhớ qua Serial của Arduino
+/// 3. Cắm pin 9V vào arduino rồi quét thẻ như bình thường, MSSV sẽ hiện lên màn hình LCD (nếu thẻ hợp lệ)
+/// 4. Sau khi hoàn tất, rút pin 9V rồi cắm arduino vào máy tính
+/// 5. Gọi hàm ReadTXTFileInSDCard() để đọc dữ liệu từ file text qua Serial
 /// </summary>
 void DiemDanhKhongKetNoi()
 {
 	ClearScreen();
-	fmt::println("Hãy chắc chắn thẻ nhớ đã được cắm vào thiết bị (đối với Arduino)");
-	fmt::print(fmt::fg(fmt::color::black) | fmt::bg(fmt::color::yellow), "CẢNH BÁO: Dữ liệu điểm danh được lưu trong bộ nhớ trước đó sẽ bị xoá sạch\n");
+	fmt::println("Hãy chắc chắn thẻ nhớ đã được cắm vào thiết bị");
+	fmt::print(fmt::fg(fmt::color::black) | fmt::bg(fmt::color::yellow), "CẢNH BÁO: Dữ liệu điểm danh (bao gồm cả dữ liệu thẻ sinh viên) được lưu trong bộ nhớ trước đó sẽ bị xoá sạch\n");
 	fmt::println("Nếu bạn muốn lưu lại kết quả điểm danh trước đó, hãy khởi động lại phần mềm");
 	fmt::println("và chọn lựa chọn 5");
 
 	fmt::println("Nhấn phím Enter để tiếp tục...");
 	cin.get();
-	WriteToSerial("prepareForDisconnect");
 
+	fmt::println("Đang gửi dữ liệu thẻ sinh viên đến thiết bị...\n");
+	WriteToSerial("prepareForDisconnect");
+	Sleep(100);
+
+	WriteToSerial(ReadWriteCSV::GetStudentIDsCSV().c_str());
+	char szBuff[32] = { 0 };
+	DWORD dwBytesRead = 0;
+	while (ReadFile(hSerial, szBuff, sizeof(szBuff) - 1, &dwBytesRead, NULL))
+	{
+		if (dwBytesRead > 0)
+		{
+			if (strncmp(szBuff, "doneRead", 8) == 0) break;
+		}
+	}
+
+	fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "Gửi dữ liệu thành công");
+	fmt::println("");
 	fmt::println("Sau khi rút thiết bị ra, hãy cắm nguồn 9V vào thiết bị");
 	fmt::println("Sau đó thực hiện việc quét thẻ điểm danh như bình thường\n");
 
 	fmt::println("Hãy rút thiết bị ra...\n");
 
-	char szBuff[32] = { 0 };
-	DWORD dwBytesRead = 0;
 	while (ReadFile(hSerial, szBuff, sizeof(szBuff) - 1, &dwBytesRead, NULL))
 	{
 
 	}
-	//CloseHandle(hSerial);
 
 	fmt::println("Khi thực hiện điểm danh xong, kết nối lại thiết bị");
 	fmt::println("rồi nhấn Enter (hoặc chọn lựa chọn 5 ở màn hình chính)\n");

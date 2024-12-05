@@ -207,3 +207,20 @@ void ReadWriteCSV::RemoveStudentFromCSV()
         fmt::println("");
     }
 }
+
+/// <summary>
+/// Lấy MSSV và ID thẻ của sinh viên
+/// </summary>
+/// <returns>Dạng CSV chứa MSSV và ID thẻ</returns>
+string ReadWriteCSV::GetStudentIDsCSV()
+{
+    //Không dùng thư viện rapidcsv vì khi xuất ra file thì ký tự kết thúc dòng là \r\n, không hoạt động tốt với thư viện SdFat trên Arduino
+    string result = "";
+
+    for (int i = 0; i < studentCount; i++)
+    {
+        result.append(fmt::format("{0},{1}\n", v_students_IDscard[i], v_students_names[i].substr(v_students_names[i].find_last_of(' ') + 1)));
+    }
+
+    return result;
+}
