@@ -24,19 +24,6 @@ string ReadWriteCSV::DirectoryPath;
 int studentCount;
 
 /// <summary>
-/// Convert từ wstring sang string (utf8) để lưu tên SV vào file CSV
-/// </summary>
-/// <param name="wstr">wstring cần convert</param>
-/// <returns></returns>
-//string wstring_to_utf8(const wstring& wstr) 
-//{
-//    int size_needed = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, nullptr, 0, nullptr, nullptr);
-//    string str(size_needed - 1, 0);  // Trừ đi 1 để bỏ ký tự null-terminator
-//    WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, &str[0], size_needed, nullptr, nullptr);
-//    return str;
-//}
-
-/// <summary>
 /// Lấy tên + MSSV của SV qua mã thẻ RFID
 /// </summary>
 /// <param name="id_card">ID thẻ</param>
@@ -66,8 +53,8 @@ void ReadWriteCSV::InitializeCSV()
 
     Student_ListCSV = rapidcsv::Document(ReadWriteCSV::DirectoryPath + "\\students_list.csv", rapidcsv::LabelParams(0, -1));
 
-    v_students_names = Student_ListCSV.GetColumn<string>("Name and Student ID");
-    v_students_IDscard = Student_ListCSV.GetColumn<string>("ID card");
+    v_students_names = Student_ListCSV.GetColumn<string>(0);
+    v_students_IDscard = Student_ListCSV.GetColumn<string>(1);
 
     studentCount = v_students_IDscard.size();
 
