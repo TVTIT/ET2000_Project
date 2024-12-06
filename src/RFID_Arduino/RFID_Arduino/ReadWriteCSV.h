@@ -8,6 +8,7 @@ public:
 	static string DirectoryPath;
 	static void GetStudentName(string id_card, string& student_name, bool& available);
 	static void InitializeCSV();
+	static void CreateNewFile();
 	static void GetPath();
 	static void InKetQuaDiemDanh();
 	static void LuuDuLieuDiemDanh();

@@ -49,7 +49,14 @@ void ReadWriteCSV::GetStudentName(string id_card, string& student_name, bool& av
 /// </summary>
 void ReadWriteCSV::InitializeCSV()
 {
-    //rapidcsv::Document doc(ReadWriteCSV::DirectoryPath + "\\students_list.csv", rapidcsv::LabelParams(0, -1));
+    ifstream file;
+    file.open(ReadWriteCSV::DirectoryPath + "\\students_list.csv");
+    if (!file)
+    {
+        CreateNewFile();
+        return;
+    }
+    file.close();
 
     Student_ListCSV = rapidcsv::Document(ReadWriteCSV::DirectoryPath + "\\students_list.csv", rapidcsv::LabelParams(0, -1));
 
@@ -59,6 +66,15 @@ void ReadWriteCSV::InitializeCSV()
     studentCount = v_students_IDscard.size();
 
     v_students_isPresent.resize(studentCount + 1);
+}
+
+void ReadWriteCSV::CreateNewFile()
+{
+    rapidcsv::Document doc(string(), rapidcsv::LabelParams(-1, -1)); //không nhận cột, ô nào làm label
+    vector<string> v = { "Name and Student ID","ID card" };
+    doc.InsertRow<string>(0, v);
+
+    doc.Save(ReadWriteCSV::DirectoryPath + "\\students_list.csv");
 }
 
 /// <summary>
