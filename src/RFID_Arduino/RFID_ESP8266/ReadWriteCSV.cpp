@@ -54,6 +54,8 @@ void ReadWriteCSV::InitializeCSV()
     if (!file)
     {
         CreateNewFile();
+        Student_ListCSV = rapidcsv::Document(ReadWriteCSV::DirectoryPath + "\\students_list.csv", rapidcsv::LabelParams(0, -1));
+        studentCount = 0;
         return;
     }
     file.close();
@@ -159,7 +161,7 @@ void ReadWriteCSV::AddStudentToCSV(string ID_Card)
 
     vector<string> newInfo = { student_name, ID_Card };
     Student_ListCSV.InsertRow(studentCount, newInfo);
-    Student_ListCSV.Save(ReadWriteCSV::DirectoryPath + "\\students_list.csv");
+    Student_ListCSV.Save();
 
     InitializeCSV();
 
@@ -191,7 +193,7 @@ void ReadWriteCSV::RemoveStudentFromCSV()
         if (int_user_input <= studentCount)
         {
             Student_ListCSV.RemoveRow(int_user_input - 1);
-            Student_ListCSV.Save(ReadWriteCSV::DirectoryPath + "\\students_list.csv");
+            Student_ListCSV.Save();
             ReadWriteCSV::InitializeCSV();
 
             fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "Xoá sinh viên thành công!");
