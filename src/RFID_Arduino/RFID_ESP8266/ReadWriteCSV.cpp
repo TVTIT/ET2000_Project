@@ -125,11 +125,11 @@ void ReadWriteCSV::InKetQuaDiemDanh()
 /// </summary>
 void ReadWriteCSV::LuuDuLieuDiemDanh()
 {
-    //rapidcsv::Document doc(ReadWriteCSV::DirectoryPath + "\\students_list.csv", rapidcsv::LabelParams(0, -1));
-    Student_ListCSV.InsertColumn(2, v_students_isPresent, "Is present");
-    Student_ListCSV.Save(ReadWriteCSV::DirectoryPath + "\\Du lieu diem danh " + GetTimeNow(1) + ".csv");
-    Student_ListCSV.RemoveColumn(2);
-    Student_ListCSV.RemoveRow(studentCount);
+    rapidcsv::Document doc = Student_ListCSV;
+    doc.InsertColumn(2, v_students_isPresent, "Is present");
+    doc.Save(ReadWriteCSV::DirectoryPath + "\\Du lieu diem danh " + GetTimeNow(1) + ".csv");
+    doc.RemoveColumn(2);
+    doc.RemoveRow(studentCount);
 
     v_students_isPresent.clear();
     v_students_isPresent.resize(studentCount + 1);
