@@ -420,14 +420,13 @@ void ReadTXTFileInSDCard()
 /// Điểm danh không cần kết nối với máy tính
 /// Cách thức hoạt động:
 /// 1. Xoá dữ liệu điểm danh ở thẻ nhớ trước đó
-/// 2. Cắm pin 9V vào arduino rồi quét thẻ như bình thường
-/// 3. Sau khi hoàn tất, rút pin 9V rồi cắm arduino vào máy tính
+/// 2. Bật công tắc pin rồi quét thẻ như bình thường
+/// 3. Sau khi hoàn tất, tắt công tắc rồi cắm wemos d1 vào máy tính
 /// 4. Gọi hàm ReadTXTFileInSDCard() để đọc dữ liệu từ file text qua Serial
 /// </summary>
 void DiemDanhKhongKetNoi()
 {
 	ClearScreen();
-	fmt::println("Hãy chắc chắn thẻ nhớ đã được cắm vào thiết bị (đối với Arduino)");
 	fmt::print(fmt::fg(fmt::color::black) | fmt::bg(fmt::color::yellow), "CẢNH BÁO: Dữ liệu điểm danh được lưu trong bộ nhớ trước đó sẽ bị xoá sạch\n");
 	fmt::println("Nếu bạn muốn lưu lại kết quả điểm danh trước đó, hãy khởi động lại phần mềm");
 	fmt::println("và chọn lựa chọn 5");
@@ -436,7 +435,7 @@ void DiemDanhKhongKetNoi()
 	cin.get();
 	WriteToSerial("prepareForDisconnect");
 
-	fmt::println("Sau khi rút thiết bị ra, hãy cắm nguồn 9V vào thiết bị");
+	fmt::println("Sau khi rút thiết bị ra, hãy bật công tắc pin");
 	fmt::println("Sau đó thực hiện việc quét thẻ điểm danh như bình thường\n");
 
 	fmt::println("Hãy rút thiết bị ra...\n");
@@ -449,7 +448,7 @@ void DiemDanhKhongKetNoi()
 	}
 	//CloseHandle(hSerial);
 
-	fmt::println("Khi thực hiện điểm danh xong, kết nối lại thiết bị");
+	fmt::println("Khi thực hiện điểm danh xong, tắt công tắc và kết nối lại thiết bị");
 	fmt::println("rồi nhấn Enter (hoặc chọn lựa chọn 5 ở màn hình chính)\n");
 
 	fmt::println("Nhấn phím Enter để tiếp tục...");
@@ -488,7 +487,7 @@ void ReadDeviceIP()
 		}
 	}
 
-	fmt::println("Kết nối thiết bị với nguồn 9V, sau khi đèn chuyển sang màu xanh dương");
+	fmt::println("Bật công tắc pin, sau khi đèn chuyển sang màu xanh dương");
 	fmt::println("thì nhấn Enter để tiếp tục...");
 	cin.get();
 

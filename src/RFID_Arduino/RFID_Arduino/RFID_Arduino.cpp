@@ -403,8 +403,8 @@ void ReadTXTFileInSDCard()
 /// Cách thức hoạt động:
 /// 1. Xoá dữ liệu điểm danh ở thẻ nhớ trước đó
 /// 2. Gửi file CSV vào thẻ nhớ qua Serial của Arduino
-/// 3. Cắm pin 9V vào arduino rồi quét thẻ như bình thường, MSSV sẽ hiện lên màn hình LCD (nếu thẻ hợp lệ)
-/// 4. Sau khi hoàn tất, rút pin 9V rồi cắm arduino vào máy tính
+/// 3. Bật công tắc pin rồi quét thẻ như bình thường, MSSV sẽ hiện lên màn hình LCD (nếu thẻ hợp lệ)
+/// 4. Sau khi hoàn tất, tát công tắc rồi cắm arduino vào máy tính
 /// 5. Gọi hàm ReadTXTFileInSDCard() để đọc dữ liệu từ file text qua Serial
 /// </summary>
 void DiemDanhKhongKetNoi()
@@ -435,7 +435,7 @@ void DiemDanhKhongKetNoi()
 
 	fmt::print(fmt::fg(fmt::color::white) | fmt::bg(fmt::color::green), "Gửi dữ liệu thành công");
 	fmt::println("");
-	fmt::println("Sau khi rút thiết bị ra, hãy cắm nguồn 9V vào thiết bị");
+	fmt::println("Sau khi rút thiết bị ra, hãy bật công tắc pin vào thiết bị");
 	fmt::println("Sau đó thực hiện việc quét thẻ điểm danh như bình thường\n");
 
 	fmt::println("Hãy rút thiết bị ra...\n");
@@ -445,7 +445,7 @@ void DiemDanhKhongKetNoi()
 
 	}
 
-	fmt::println("Khi thực hiện điểm danh xong, kết nối lại thiết bị");
+	fmt::println("Khi thực hiện điểm danh xong, tắt công tắc và kết nối lại thiết bị");
 	fmt::println("rồi nhấn Enter (hoặc chọn lựa chọn 5 ở màn hình chính)\n");
 
 	fmt::println("Nhấn phím Enter để tiếp tục...");
