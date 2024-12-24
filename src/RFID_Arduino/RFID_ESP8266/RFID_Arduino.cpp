@@ -93,7 +93,9 @@ void InitializeConsole()
 	dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
 	SetConsoleMode(hOut, dwMode);
 
-	SetConsoleTitleW(L"Phần mềm điểm danh bằng thẻ sinh viên");
+	wstring title = L"Phần mềm điểm danh bằng thẻ sinh viên ";
+	title.append(VERSION_LABEL);
+	SetConsoleTitleW(title.c_str());
 }
 
 /// <summary>
