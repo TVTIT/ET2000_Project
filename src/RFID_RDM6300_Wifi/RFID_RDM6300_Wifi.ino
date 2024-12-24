@@ -304,6 +304,7 @@ void loop() {
       strcat(printCommand, password);
       Serial.print(printCommand);
     } else if (strncmp(commandReceived, "reconnectWifi", 13) == 0) {
+      writeFile(FILE_IS_USING_WIFI, "1");
       connectWifi(false);
     } else if (strncmp(commandReceived, "printTXTFile", 12) == 0) {
       File fileDiemDanh = LittleFS.open(FILE_DIEM_DANH, "r");
