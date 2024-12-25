@@ -5,7 +5,7 @@
 - **Màu đỏ**: Thiết bị **mất kết nối** với thẻ nhớ, mọi chức năng sẽ không hoạt động.
 
 ## Video giới thiệu và hướng dẫn sử dụng phần mềm
-[Xem video trên YouTube](https://www.youtube.com/watch?v=lwuSDvUjh_Y)
+[Xem video trên YouTube](https://youtu.be/ZJCSwvYm6-4)
 
 ## Các thành phần chính của mạch
 - **Arduino UNO R3**: Bộ vi điều khiển chính của thiết bị.

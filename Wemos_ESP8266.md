@@ -29,6 +29,9 @@ Trong hầu hết trường hợp, Windows sẽ tự nhận diện và cài đ�
 Do hạn chế của màn hình LCD 1602 nên cột sóng được thiết kế hơi giống hiển thị phần trăm pin trên các thiết bị khác. Cột sóng Wifi có 3 mức độ tương ứng với từng mức độ mạnh yêu của Wifi.
 ![Hình minh hoạ cột sóng Wifi](wifi_signal.jpg)
 
+## Video giới thiệu và hướng dẫn sử dụng phần mềm
+[Xem video trên YouTube](https://youtu.be/8iWZg057fqM)
+
 ## Các thành phần chính của mạch
 - **Wemos D1 Wifi ESP8266**: Bộ vi điều khiển và kết nối Wifi cho thiết bị.
 - **Module RFID 125kHz RDM6300**: Dùng để đọc ID từ thẻ sinh viên.
