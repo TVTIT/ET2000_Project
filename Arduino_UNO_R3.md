@@ -18,3 +18,6 @@
 
 ## Sơ đồ lắp mạch
 ![Hình ảnh sơ đồ lắp mạch](Sơ_đồ_mạch_arduino.png)
+
+## Schematic
+![Hình ảnh schematic](Schematic_arduino.png)

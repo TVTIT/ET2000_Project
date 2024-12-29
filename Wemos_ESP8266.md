@@ -42,3 +42,6 @@ Do hạn chế của màn hình LCD 1602 nên cột sóng được thiết kế 
 
 ## Sơ đồ lắp mạch
 ![Hình ảnh sơ đồ lắp mạch](Sơ_đồ_mạch_wemos.png)
+
+## Schematic
+![Hình ảnh schematic](Schematic_wemos.png)
